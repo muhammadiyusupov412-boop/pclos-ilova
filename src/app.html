@@ -1,0 +1,1675 @@
+<title>PCLOS Baholash</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: phone-first single column, iOS-style form screens, bottom tab bar; cards only for results */
+:root{
+  --bg:#F5F6FA; --surface:#FFFFFF; --ink:#11142A; --muted:#5E6579; --line:#D8DCE6; --soft:#EDEFF6;
+  --primary:#2B4BF2; --primary-ink:#FFFFFF; --primary-soft:#E6EAFF;
+  --gA:#1E8449; --gB:#7CC45A; --gC:#E9C80F; --gD:#F39C12; --gE:#E2402E; --gF:#A31F1F;
+  --pos:#C0392B; --neg:#2B6CB0;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D0F17; --surface:#171A25; --ink:#ECEEF6; --muted:#9BA2B6; --line:#2B3040; --soft:#1F2330;
+  --primary:#6C83FF; --primary-ink:#0D0F17; --primary-soft:#232A4D;
+  --gA:#33B06A; --gB:#8FD06B; --gC:#F2D33A; --gD:#F5A93A; --gE:#F06450; --gF:#D25050;
+  --pos:#F07A6C; --neg:#6FA8E8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D0F17; --surface:#171A25; --ink:#ECEEF6; --muted:#9BA2B6; --line:#2B3040; --soft:#1F2330;
+  --primary:#6C83FF; --primary-ink:#0D0F17; --primary-soft:#232A4D;
+  --gA:#33B06A; --gB:#8FD06B; --gC:#F2D33A; --gD:#F5A93A; --gE:#F06450; --gF:#D25050;
+  --pos:#F07A6C; --neg:#6FA8E8; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px calc(96px + env(safe-area-inset-bottom,0px))}
+h1{font-size:28px;line-height:1.15;font-weight:800;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.sub{font-size:20px;font-weight:500;margin:2px 0 0;color:var(--ink)}
+h2{font-size:18px;font-weight:700;margin:0;letter-spacing:-.01em}
+h3{font-size:15px;font-weight:700;margin:0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none;background:var(--surface)}
+.lang button{border:0;background:none;color:var(--muted);font:600 12px var(--font);padding:6px 9px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px 12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.lbl{font-weight:700;font-size:15px}
+.lblrow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;font:500 16px var(--font);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:11px 12px;min-height:46px;appearance:none;-webkit-appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 15px var(--font);border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:var(--primary-ink);font-size:17px;letter-spacing:.04em;text-transform:uppercase;min-height:50px;width:100%}
+.btn.ghost{background:none}
+.btn.danger{color:var(--gE);border-color:color-mix(in srgb,var(--gE) 40%,var(--line))}
+.btn.sm{min-height:36px;padding:7px 11px;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>.btn{flex:1 1 auto}
+.group{margin-top:26px;display:flex;flex-direction:column;gap:14px}
+.ghead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.ghead h2{font-size:17px}
+.code{font:600 12px var(--font);color:var(--muted);letter-spacing:.04em}
+.pi{font:600 12px var(--font);padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pi.s1{background:color-mix(in srgb,var(--gA) 16%,var(--surface));color:var(--gA)}
+.pi.s05{background:color-mix(in srgb,var(--gC) 20%,var(--surface));color:color-mix(in srgb,var(--gC) 70%,var(--ink))}
+.pi.s0{background:color-mix(in srgb,var(--gE) 14%,var(--surface));color:var(--gE)}
+.info{border:0;background:none;color:var(--primary);font:600 13px var(--font);padding:2px 0;cursor:pointer}
+.std{font-size:13px;color:var(--muted);background:var(--soft);border-radius:8px;padding:9px 11px}
+.progress{height:6px;border-radius:99px;background:var(--soft);overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:width .2s}
+.result{border:2px solid var(--primary);border-radius:10px;background:var(--surface);padding:14px 16px;display:flex;align-items:center;gap:14px}
+.result .walker{width:44px;height:44px;flex:none;color:var(--primary)}
+.result .big{font-size:30px;font-weight:800;letter-spacing:-.01em;flex:1}
+.pill{background:var(--primary);color:var(--primary-ink);font-weight:700;font-size:24px;border-radius:8px;padding:6px 12px;font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;font-weight:800;color:#fff;font-size:17px;flex:none}
+.bA{background:var(--gA)}.bB{background:var(--gB)}.bC{background:var(--gC)}.bD{background:var(--gD)}.bE{background:var(--gE)}.bF{background:var(--gF)}
+ul.recs{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+ul.recs li b{font-weight:600}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.item .meta{flex:1;min-width:0}
+.item .name{font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3}
+.item .meta{cursor:pointer}
+.ibtn{width:36px;height:36px;padding:0!important;min-height:36px}
+.item .pct{font-weight:700;font-variant-numeric:tabular-nums}
+.tag{font:600 11px var(--font);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-left:6px}
+.section{margin-top:28px;display:flex;flex-direction:column;gap:10px}
+.section>p{margin:0}
+.chartbox{position:relative;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px}
+.chartbox canvas{display:block;width:100%!important}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 7px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+th{font-weight:700;color:var(--muted);background:var(--surface);position:sticky;top:0}
+td.l,th.l{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.hm td{min-width:34px}
+.cm td{min-width:30px;padding:4px 3px;font-size:11px}
+.cm th{font-size:11px;padding:4px 3px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabs nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+.tabs button{border:0;background:none;color:var(--muted);font:600 11px var(--font);padding:8px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.tabs button svg{width:24px;height:24px}
+.tabs button[aria-current="page"]{color:var(--primary)}
+.seg{display:flex;background:var(--soft);border-radius:8px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;font:600 13px var(--font);color:var(--muted);padding:7px 6px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(80px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;z-index:40;max-width:90vw}
+.note{font-size:13px;color:var(--muted);border-left:3px solid var(--line);padding:2px 0 2px 10px}
+.formula{font:600 16px var(--font);background:var(--soft);border-radius:8px;padding:12px;text-align:center}
+.cfield{width:72px!important;min-height:36px!important;padding:6px 8px!important;font-size:14px!important;text-align:right}
+.confirm{display:flex;gap:8px;align-items:center}
+@media (max-width:380px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}h1{font-size:25px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* Leaflet 1.9.4 CSS (inlined) */
+/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: none;
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: none;
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: none;
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: none;
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+
+#map{height:62vh;min-height:340px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft)}
+.ped-icon{background:none;border:0}
+.map-north{background:rgba(255,255,255,.85);border-radius:6px;padding:2px 4px}
+.map-legend{background:#fff;color:#111;border-radius:6px;padding:8px 10px;font:500 11.5px var(--font);box-shadow:0 1px 4px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:2px}
+.map-legend b{font-size:12.5px;margin-bottom:2px;cursor:pointer}
+.map-legend.min div{display:none}
+.map-legend div{display:flex;align-items:center;gap:6px}
+.leaflet-popup-content{font-family:var(--font);font-size:13px}
+.leaflet-container a{color:var(--primary)}
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="tabs"><nav id="tabs"></nav></div>
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="fileXlsx" accept=".xlsx,.xls" hidden>
+<input type="file" id="fileJson" accept=".json,application/json" hidden>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.mini.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+"use strict";
+/* ===================== METODIKA (Ahmed va boshq., 2021, IJERPH 18:8813 + Excel shablon) ===================== */
+const STD3 = {
+  uz:["Mavjud va standartga mos","Mavjud, lekin standartga to‘liq mos emas","Mavjud emas"],
+  en:["Present and meets the standard","Present, but not fully to standard","Not present"],
+  ru:["Есть и соответствует стандарту","Есть, но не полностью по стандарту","Отсутствует"]};
+const std3 = () => [1,0.5,0].map((v,i)=>({v,uz:STD3.uz[i],en:STD3.en[i],ru:STD3.ru[i]}));
+const GROUPS_AH = [
+  {id:"g1", codes:["P01","P02","P03","P04"], uz:"Yo‘l geometriyasi va tashkil etish", en:"Road geometry and layout", ru:"Геометрия дороги и организация",s:{uz:"Geometriya",en:"Geometry",ru:"Геометрия"}},
+  {id:"g2", codes:["P05","P06","P07","P08","P09","P10"], uz:"Nazorat va xavfsizlik", en:"Control and safety", ru:"Контроль и безопасность",s:{uz:"Nazorat",en:"Control",ru:"Контроль"}},
+  {id:"g3", codes:["P11","P12","P13","P14"], uz:"Yuzasi va ekspluatatsiya", en:"Surface and maintenance", ru:"Покрытие и эксплуатация",s:{uz:"Yuza",en:"Surface",ru:"Покрытие"}},
+  {id:"g4", codes:["P15","P16","P17"], uz:"Inklyuzivlik va ko‘rinarlilik", en:"Inclusiveness and visibility", ru:"Инклюзивность и видимость",s:{uz:"Inklyuzivlik",en:"Inclusive",ru:"Инклюзив."}}];
+const IND_AH = [
+ {c:"P01",ci:4.83,crf:46,src:"Nilsson power model (Elvik 2009): fatal ∝ (v₁/v₀)⁴, 70→60 km/h ⇒ 1−(60/70)⁴ ≈ 46%",num:"speed",n:{uz:"Tezlikni cheklash",en:"Speed limit",ru:"Ограничение скорости"},
+  o:[{v:1,uz:"≤60 km/soat",en:"≤60 km/h",ru:"≤60 км/ч"},{v:0,uz:">60 km/soat",en:">60 km/h",ru:">60 км/ч"}],
+  s:{uz:"Shaharlarda va viloyat, tuman markazlarida eng yuqori tezlik 60 km/soat (YHQ 78-band, VM 03.04.2023 yildagi 140-son qarori tahririda).",en:"Maximum speed in cities and regional/district centres is 60 km/h (Traffic Rules cl. 78 as amended by Cabinet Resolution No. 140 of 03.04.2023).",ru:"Максимальная скорость в городах и центрах областей и районов — 60 км/ч (ПДД п. 78 в ред. Постановления КМ № 140 от 03.04.2023)."},
+  r:{uz:"Tezlik chegarasini 60 km/soatgacha tushirish, tezlikni pasaytiruvchi vositalar o‘rnatish",en:"Lower the limit to 60 km/h and add traffic calming",ru:"Снизить ограничение до 60 км/ч, установить средства успокоения"}},
+ {c:"P02",ci:5.0,crf:48,src:"FHWA-SA-18-041 Toolbox: high-visibility crosswalk, CMF 0.52 (CMF ID 4658; Chen et al. 2012); IIHS 2026: up to 48%",n:{uz:"Piyodalar o‘tish joyi chizig‘i (1.14)",en:"Zebra crossing",ru:"Пешеходная «зебра»"},o:std3(),
+  s:{uz:"O‘z DSt 3419:2022: 1.14.1 – qatnov qismi o‘qiga parallel bir xil rangdagi yaxlit chiziqlar; 1.14.2 – oq va sariq navbatlashgan chiziqlar (oralig‘i 0,10 m); 1.14.3 – kengligi 6 m dan ortiq o‘tish joyida yo‘nalish ko‘rsatkichlari bilan; 1.14.4 – ta’lim muassasalari oldida oq-qizil chiziqlar. GOST 23457-86, 3.2.17: svetoforsiz joyda 1.14.1/1.14.2, svetoforli joyda 1.14.3.",en:"O‘z DSt 3419:2022: 1.14.1 solid stripes of one colour parallel to the road axis; 1.14.2 alternating white/yellow stripes (0.10 m gap); 1.14.3 with direction arrows where wider than 6 m; 1.14.4 white/red near schools. GOST 23457-86 cl. 3.2.17: 1.14.1/1.14.2 unsignalized, 1.14.3 signalized.",ru:"O‘z DSt 3419:2022: 1.14.1 — сплошные линии одного цвета параллельно оси; 1.14.2 — чередующиеся белые и жёлтые линии (зазор 0,10 м); 1.14.3 — при ширине >6 м со стрелками направления; 1.14.4 — бело-красная у учебных заведений. ГОСТ 23457-86, п. 3.2.17: 1.14.1/1.14.2 на нерегулируемых, 1.14.3 на регулируемых."},
+  r:{uz:"Piyodalar o‘tish joyi chizig‘ini O‘z DSt 3419:2022 bo‘yicha qayta chizish (maktab oldida 1.14.4)",en:"Repaint the crossing per O‘z DSt 3419:2022 (1.14.4 near schools)",ru:"Обновить разметку по O‘z DSt 3419:2022 (у школ — 1.14.4)"}},
+ {c:"P03",ci:1.0,crf:0,src:"Piyodalar avariyasiga ta’sir bo‘yicha CMF yo‘q / no pedestrian CMF",num:"width",n:{uz:"Piyodalar o‘tish joyining kengligi",en:"Crosswalk width",ru:"Ширина перехода"},
+  o:[{v:1,uz:"Me’yoriy kenglikda (shaharda ≥4 m, qishloqda ≥3 m)",en:"Required width (≥4 m urban, ≥3 m rural)",ru:"Нормативной ширины (город ≥4 м, село ≥3 м)"},{v:0.5,uz:"Me’yordan 1 m gacha kam",en:"Up to 1 m below standard",ru:"Меньше нормы до 1 м"},{v:0,uz:"Me’yordan 1 m dan ortiq kam",en:"More than 1 m below standard",ru:"Меньше нормы более чем на 1 м"}],
+  s:{uz:"O‘z DSt 3419:2022: 1.14.1/1.14.2 chizig‘ining kengligi P = 4,0 m (shahar ko‘chalarida), 3,0 m (qishloq hududida). GOST 23457-86, 3.2.17: soatiga har 500 piyodaga 1 m. Piyodalar oqimi kiritilsa, me’yoriy kenglik avtomatik hisoblanadi.",en:"O‘z DSt 3419:2022: marking width P = 4.0 m on city streets, 3.0 m in rural areas. GOST 23457-86 cl. 3.2.17: 1 m per 500 ped/h. Required width is computed when pedestrian flow is entered.",ru:"O‘z DSt 3419:2022: ширина разметки P = 4,0 м в городе, 3,0 м в сельской местности. ГОСТ 23457-86, п. 3.2.17: 1 м на каждые 500 пеш./ч. При вводе потока ширина считается автоматически."},
+  r:{uz:"O‘tish joyini kerakli kenglikka yetkazish (kamida 4 m, har 500 piyoda/soatga 1 m)",en:"Widen the crossing to the required width (≥4 m, 1 m per 500 ped/h)",ru:"Расширить переход до требуемой ширины (≥4 м, 1 м на 500 пеш./ч)"}},
+ {c:"P04",ci:2.58,crf:19,src:"FHWA-SA-18-041: road diet, urban, CMF 0.81 (CMF ID 5554)",num:"lanes",n:{uz:"Kesib o‘tish uzunligi (harakat tasmalari soni)",en:"Crossing length",ru:"Длина перехода"},
+  o:[{v:1,uz:"4 va undan kam harakat tasmasi",en:"4 lanes or fewer",ru:"4 полосы и меньше"},{v:0.5,uz:"5–6 harakat tasmasi",en:"5–6 lanes",ru:"5–6 полос"},{v:0,uz:"6 dan ortiq harakat tasmasi",en:"More than 6 lanes",ru:"Более 6 полос"}],
+  s:{uz:"OTB CAREC qo‘llanmasi (2022): 4 harakat tasmasidan ortiq bo‘lsa, kesib o‘tish xavfsizlik orolchasi yoki trotuarni kengaytirish bilan qisqartiriladi. SHNQ 2.07.06-24, 32-band: qatnov qismi 14 m dan keng ko‘chalarda turli sathdagi o‘tish joyi loyihalanishiga yo‘l qo‘yiladi.",en:"ADB CAREC manual (2022): beyond 4 lanes, shorten the crossing with a refuge or curb extension. SHNQ 2.07.06-24 cl. 32: grade-separated crossings allowed where the carriageway exceeds 14 m.",ru:"Руководство CAREC (2022): при более 4 полос сокращать переход островком или уширением тротуара. ШНК 2.07.06-24, п. 32: при ширине проезжей части более 14 м допускаются внеуличные переходы."},
+  r:{uz:"Kesib o‘tish uzunligini qisqartirish: trotuarni kengaytirish yoki xavfsizlik orolchasi; qatnov qismi 14 m dan keng bo‘lsa turli sathdagi o‘tish joyini ko‘rib chiqish",en:"Shorten the crossing with curb extensions or a refuge; consider a grade-separated crossing if the carriageway exceeds 14 m",ru:"Сократить переход уширением или островком; при ширине >14 м рассмотреть внеуличный переход"}},
+ {c:"P05",ci:3.08,crf:25,src:"FHWA-SA-18-041: advance stop/yield line, CMF 0.75 (CMF ID 9017)",n:{uz:"To‘xtash chizig‘i (1.12)",en:"Stop line",ru:"Стоп-линия"},o:std3(),
+  s:{uz:"O‘z DSt 3419:2022: 1.12 – eni 0,4 m bo‘lgan yaxlit chiziq. GOST 23457-86, 3.2.14–3.2.16: svetoforli joyda va 2.5 belgisi oldida chiziladi; o‘tish joyidan kamida 1 m oldin, yo‘l ustidagi svetofordan kamida 10 m (yon tomondagidan 3 m). Svetoforsiz o‘tishda avtomatik «talab qilinmaydi».",en:"O‘z DSt 3419:2022: 1.12 is a 0.4 m solid line. GOST 23457-86 cl. 3.2.14–3.2.16: at signalized locations and at sign 2.5; at least 1 m before the crossing, ≥10 m from an overhead signal (3 m from a side signal). Auto N/A at unsignalized crossings.",ru:"O‘z DSt 3419:2022: 1.12 — сплошная линия шириной 0,4 м. ГОСТ 23457-86, п. 3.2.14–3.2.16: на регулируемых участках и у знака 2.5; не менее 1 м до перехода, ≥10 м до светофора над дорогой (3 м — сбоку). На нерегулируемых — авто «не требуется»."},
+  r:{uz:"1.12 stop-chizig‘ini o‘tishdan kamida 1 m oldin chizish (GOST 23457-86)",en:"Mark stop line 1.12 at least 1 m before the crossing (GOST 23457-86)",ru:"Нанести стоп-линию 1.12 не менее 1 м до перехода (ГОСТ 23457-86)"}},
+ {c:"P06",ci:1.0,crf:0,src:"CMF yo‘q / no pedestrian CMF",n:{uz:"O‘tish joyining yo‘l o‘qiga nisbatan burchagi",en:"Crossing orientation (90°)",ru:"Ориентация (90°)"},
+  o:[{v:1,uz:"≥85° (deyarli to‘g‘ri burchak)",en:"≥85° (near right angle)",ru:"≥85° (почти прямой угол)"},{v:0,uz:"<85°",en:"<85°",ru:"<85°"}],
+  s:{uz:"O‘z DSt 3644:2023, 6.22-band: o‘tish joyi qatnov qismi o‘qiga perpendikulyar, o‘qlar orasidagi burchak 85° dan kam bo‘lmasligi kerak.",en:"O‘z DSt 3644:2023, cl. 6.22: crossing perpendicular to the carriageway, angle not less than 85°.",ru:"O‘z DSt 3644:2023, п. 6.22: переход перпендикулярен оси проезжей части, угол не менее 85°."},
+  r:{uz:"O‘tishni yo‘l o‘qiga kamida 85° burchak ostida qayta joylashtirish",en:"Realign the crossing at ≥85° to the road axis",ru:"Переориентировать переход под углом ≥85° к оси дороги"}},
+ {c:"P07",ci:1.0,crf:0,src:"CMF yo‘q / no pedestrian CMF",n:{uz:"To‘suvchi ustunchalar",en:"Poles / bollards",ru:"Столбики / болларды"},o:std3(),
+  s:{uz:"Mahalliy me’yor topilmadi, maqoladagi talab qo‘llanadi: oq-qora nur qaytaruvchi, balandligi 0,75–1,2 m, eni 75 mm, oralig‘i ≥1,2 m, hoshiyadan 0,45 m. SHNQ 2.07.02-22, 24-band: yo‘lakdagi qurilmalar o‘rindiqli aravacha harakat maydonini qisqartirmasligi kerak.",en:"No local norm found; article values apply: black-white reflective, 0.75–1.2 m high, 75 mm wide, ≥1.2 m apart, 0.45 m from the curb. SHNQ 2.07.02-22 cl. 24: street furniture must not narrow the wheelchair path.",ru:"Местной нормы нет, применяются значения статьи: чёрно-белые световозвращающие, высота 0,75–1,2 м, ширина 75 мм, шаг ≥1,2 м, 0,45 м от бордюра. ШНК 2.07.02-22, п. 24: устройства не должны сужать путь для колясок."},
+  r:{uz:"Standart bollardlar o‘rnatish: 0,75–1,2 m, oralig‘i kamida 1,2 m (nogironlar aravachasi uchun)",en:"Install standard bollards: 0.75–1.2 m high, at least 1.2 m apart (wheelchair access)",ru:"Установить столбики 0,75–1,2 м с шагом не менее 1,2 м (для колясок)"}},
+ {c:"P08",ci:3.58,crf:31,src:"FHWA-SA-18-041: raised median at unsignalized crossing, CMF 0.69 (CMF ID 8799)",n:{uz:"Xavfsizlik orolchasi",en:"Refuge island / median",ru:"Островок безопасности"},o:std3(),
+  s:{uz:"GOST 23457-86, 5.3.5-band: orolcha har bir harakat tasmasida ≥400 avt/soat va trotuardan orolchagacha ≥7,5 m (to‘siqli orolchada ≥10,5 m) bo‘lganda quriladi. OTB CAREC (2022): kengligi kamida 1,8 m. O‘tish 15 m dan qisqa yoki tasma yuklamasi 400 avt/soatdan kam bo‘lsa, avtomatik «talab qilinmaydi».",en:"GOST 23457-86, cl. 5.3.5: a refuge is built at ≥400 veh/h per lane and ≥7.5 m from curb to island (≥10.5 m with barriers). ADB CAREC (2022): at least 1.8 m wide. Auto N/A when the crossing is under 15 m or lane flow under 400 veh/h.",ru:"ГОСТ 23457-86, п. 5.3.5: островок устраивается при ≥400 авт./ч на полосу и расстоянии ≥7,5 м (≥10,5 м с ограждением). CAREC (2022): ширина не менее 1,8 м. Авто «не требуется» при длине <15 м или нагрузке <400 авт./ч на полосу."},
+  r:{uz:"Kengligi kamida 1,8 m xavfsizlik orolchasi qurish (GOST 23457-86, 5.3.5)",en:"Build a refuge island at least 1.8 m wide (GOST 23457-86, 5.3.5)",ru:"Устроить островок шириной не менее 1,8 м (ГОСТ 23457-86, п. 5.3.5)"}},
+ {c:"P09",ci:3.08,crf:25,src:"IIHS 2026 (Zegeer et al. 2005): advance warning signs −25% pedestrian crashes",n:{uz:"Yo‘l belgilari",en:"Road signage",ru:"Дорожные знаки"},o:std3(),
+  s:{uz:"O‘z DSt 3283:2023: 5.16.1/5.16.2 «Piyodalar o‘tish joyi» belgilari (I o‘lcham, 600 mm), svetoforsiz o‘tish oldida 1.20 ogohlantiruvchi belgi, ko‘zi ojizlar o‘tadigan joyda 7.15 lavhasi. Joylashuvi GOST 23457-86, 2.6.22-band bo‘yicha.",en:"O‘z DSt 3283:2023: signs 5.16.1/5.16.2 “Pedestrian crossing” (size I, 600 mm), warning sign 1.20 before unsignalized crossings, plate 7.15 where blind pedestrians cross. Placement per GOST 23457-86 cl. 2.6.22.",ru:"O‘z DSt 3283:2023: знаки 5.16.1/5.16.2 «Пешеходный переход» (типоразмер I, 600 мм), знак 1.20 перед нерегулируемым переходом, табличка 7.15 где переходят слепые. Установка по ГОСТ 23457-86, п. 2.6.22."},
+  r:{uz:"5.16.1 / 5.16.2 (kerak bo‘lsa 1.20) belgilarini O‘z DSt 3283:2023 bo‘yicha o‘rnatish",en:"Install signs 5.16.1/5.16.2 (and 1.20 if needed) per O‘z DSt 3283:2023",ru:"Установить знаки 5.16.1/5.16.2 (и 1.20) по O‘z DSt 3283:2023"}},
+ {c:"P10",ci:4.75,crf:45,src:"IIHS 2026 (Fitzpatrick et al. 2021): pedestrian hybrid beacon −45% injury/fatal pedestrian crashes; FHWA toolbox CMF 0.45 (ID 9020)",n:{uz:"Piyodalar svetofori",en:"Pedestrian signal",ru:"Пешеходный светофор"},o:std3(),
+  s:{uz:"GOST 23457-86: rostlanadigan chorrahadagi barcha o‘tishlarda piyoda svetofori shart (4.31), yashil ishora o‘chishidan oldin 3 s miltillaydi (4.35), svetofor o‘tish chegarasidan 1 m dan uzoq emas (4.21). Svetoforsiz joyda svetofor kerak, agar 8 soat davomida asosiy yo‘lda ≥600 avt/soat (ajratuvchi tasmali yo‘lda ≥1000) va ≥150 piyoda/soat bo‘lsa (4.14). O‘zMSt 349:2024: ovozli va taktil ishora (F-ilova).",en:"GOST 23457-86: every crossing at a signalized intersection needs a pedestrian signal (4.31), green flashes 3 s before ending (4.35), signal within 1 m of the crossing (4.21). An unsignalized site warrants a signal at ≥600 veh/h on the major road (≥1000 with a median) and ≥150 ped/h for 8 h (4.14). O‘zMSt 349:2024: audible and tactile signals (Annex F).",ru:"ГОСТ 23457-86: все переходы на регулируемом перекрёстке — с пешеходными светофорами (4.31), мигание зелёного 3 с (4.35), не далее 1 м от перехода (4.21). На нерегулируемом светофор нужен при ≥600 авт./ч (≥1000 с разделительной) и ≥150 пеш./ч в течение 8 ч (4.14). O‘zMSt 349:2024: звуковая и тактильная сигнализация (прил. F)."},
+  r:{uz:"Piyoda svetoforini o‘rnatish yoki ta’mirlash: 3 s miltillash, taymer, ovozli ishora (GOST 23457-86, O‘zMSt 349:2024)",en:"Install or repair the pedestrian signal: 3 s flashing green, countdown, audible signal",ru:"Установить или отремонтировать пешеходный светофор: мигание 3 с, табло, звук"}},
+ {c:"P11",ci:2.92,crf:23,src:"FHWA-SA-18-041: overhead lighting, injury crashes, CMF 0.77 (CMF ID 199)",n:{uz:"Yo‘l (ko‘cha)ning yoritilishi",en:"Additional lighting",ru:"Дополнительное освещение"},
+  o:[{v:1,uz:"Yetarli yoritish mavjud",en:"Enough street lighting",ru:"Достаточное освещение"},{v:0.5,uz:"Yoritish mavjud, lekin yetarli emas",en:"Lighting present but not enough",ru:"Освещение есть, но недостаточное"},{v:0,uz:"Yoritish mavjud emas",en:"No lighting",ru:"Освещения нет"}],
+  s:{uz:"O‘z DSt 3644:2023, 6.18-band: yoritilganlik kunduzi ≥50 lx, kechqurun ≥20 lx, tunda ≥10 lx. 6.29-band: yaqinlashish yo‘lining yoritilgan uzunligi 40 km/soatda 50 m, 60 km/soatda 75 m, 90 km/soatda 150 m.",en:"O‘z DSt 3644:2023, cl. 6.18: ≥50 lx day, ≥20 lx evening, ≥10 lx night. Cl. 6.29: lit approach 50 m at 40 km/h, 75 m at 60 km/h, 150 m at 90 km/h.",ru:"O‘z DSt 3644:2023, п. 6.18: днём ≥50 лк, вечером ≥20 лк, ночью ≥10 лк. П. 6.29: освещённый подход 50 м при 40 км/ч, 75 м при 60 км/ч, 150 м при 90 км/ч."},
+  r:{uz:"O‘tish joyi va yaqinlashishini O‘z DSt 3644:2023 bo‘yicha yoritish (tunda ≥10 lx, 60 km/soatda 75 m)",en:"Light the crossing and approaches per O‘z DSt 3644:2023 (≥10 lx at night, 75 m at 60 km/h)",ru:"Осветить переход и подходы по O‘z DSt 3644:2023 (ночью ≥10 лк, 75 м при 60 км/ч)"}},
+ {c:"P12",ci:1.25,crf:3,src:"FHWA-SA-18-041: pavement friction (skid overlay), CMF 0.97",n:{uz:"Qoplamaning tishlashish koeffitsienti",en:"Skid resistance",ru:"Шероховатость покрытия"},o:[{v:1,uz:"Tishlashish yaxshi (≥0,3), sirpanchiq emas",en:"Good friction (≥0.3), not slippery",ru:"Хорошее сцепление (≥0,3)"},{v:0.5,uz:"Ayrim joylari sirpanchiq / silliqlangan",en:"Some slippery or polished patches",ru:"Местами скользкое / отполированное"},{v:0,uz:"Sirpanchiq qoplama (<0,3)",en:"Slippery surface (<0.3)",ru:"Скользкое покрытие (<0,3)"}],
+  s:{uz:"GOST R 50597-93, 3.1.4: qoplamaning tishlashish koeffitsienti kamida 0,3 bo‘lishi kerak (PKRS-2 asbobida). 4.2.6: yo‘l chizig‘ining tishlashish koeffitsienti qoplamanikining kamida 0,75 qismi. Lug‘at: tishlashish koeffitsienti 0,3 dan kichik yo‘l bo‘lagi – sirpanchiq yo‘l.",en:"GOST R 50597-93 cl. 3.1.4: pavement friction coefficient at least 0.3 (PKRS-2). Cl. 4.2.6: marking friction at least 0.75 of the pavement value.",ru:"ГОСТ Р 50597-93, п. 3.1.4: коэффициент сцепления покрытия не менее 0,3 (ПКРС-2). П. 4.2.6: сцепление разметки не менее 0,75 от покрытия."},
+  r:{uz:"Qoplamada g‘adir-budirlik hosil qilish (sirt ishlov berish) – tishlashish koeffitsienti ≥0,3",en:"Restore surface texture so friction is ≥0.3",ru:"Устроить шероховатость, сцепление ≥0,3"}},
+ {c:"P13",ci:1.0,crf:0,src:"CMF yo‘q / no pedestrian CMF",n:{uz:"Yo‘ldan suv ketkazish qurilmasi",en:"Drainage",ru:"Водоотвод"},
+  o:[{v:1,uz:"Drenaj mavjud",en:"Drainage present",ru:"Водоотвод есть"},{v:0,uz:"Drenaj mavjud emas",en:"No drainage",ru:"Водоотвода нет"}],
+  s:{uz:"O‘z DSt 3644:2023, 6.17-band: qor va yomg‘ir suvi lotoklar orqali chetlatiladi, piyoda yo‘lagidagi lotoklar po‘lat panjara bilan yopiladi.",en:"O‘z DSt 3644:2023, cl. 6.17: storm water drained by gutters; gutters on walkways covered with steel grates.",ru:"O‘z DSt 3644:2023, п. 6.17: водоотвод лотками; лотки на пешеходных путях закрываются стальными решётками."},
+  r:{uz:"Yo‘ldan suv ketkazish qurilmasini (lotok, panjarali suv qabul qilgich) qurish yoki tozalash",en:"Build or clear surface drainage (gutters, grated inlets)",ru:"Устроить или прочистить водоотвод (лотки, решётчатые дождеприёмники)"}},
+ {c:"P14",ci:1.0,crf:0,src:"CMF yo‘q / no pedestrian CMF",n:{uz:"Yo‘l qoplamasining holati",en:"Surface standard",ru:"Состояние покрытия"},
+  o:[{v:1,uz:"Ravon, o‘nqir-cho‘nqirsiz",en:"Even, no potholes",ru:"Ровное, без выбоин"},{v:0.5,uz:"Mayda nuqsonlar, me’yor chegarasida",en:"Minor defects within limits",ru:"Мелкие дефекты в пределах нормы"},{v:0,uz:"O‘nqir-cho‘nqir me’yordan katta",en:"Potholes beyond limits",ru:"Выбоины сверх нормы"}],
+  s:{uz:"GOST R 50597-93, 3.1.1–3.1.2: qoplamada cho‘kish, o‘yilgan joy (o‘nqir-cho‘nqir) bo‘lmasligi; alohida nuqson uzunligi 15 sm, eni 60 sm, chuqurligi 5 sm dan oshmasligi kerak; trotuar va piyodalar yo‘laklariga ham shu talab. SHNQ 2.07.02-22, 22-band: plitalar orasidagi chok 1,0 sm dan oshmasin.",en:"GOST R 50597-93 cl. 3.1.1–3.1.2: no subsidence or potholes; a single defect at most 15 cm long, 60 cm wide, 5 cm deep; same for sidewalks. SHNQ 2.07.02-22 cl. 22: joints between slabs at most 1.0 cm.",ru:"ГОСТ Р 50597-93, п. 3.1.1–3.1.2: без просадок и выбоин; отдельный дефект не более 15 см в длину, 60 см в ширину, 5 см в глубину; то же для тротуаров. ШНК 2.07.02-22, п. 22: швы между плитами не более 1,0 см."},
+  r:{uz:"O‘nqir-cho‘nqir va cho‘kishlarni ta’mirlash (GOST R 50597-93 chegaralari)",en:"Repair potholes and subsidence (GOST R 50597-93 limits)",ru:"Устранить выбоины и просадки (пределы ГОСТ Р 50597-93)"}},
+ {c:"P15",ci:1.0,crf:0,src:"CMF yo‘q (foydalanish imkoniyati talabi) / no CMF (accessibility requirement)",n:{uz:"Hoshiya (bordyur) pandusi",en:"Dropped curb / curb ramp",ru:"Пандус / понижение бордюра"},o:std3(),
+  s:{uz:"SHNQ 2.07.02-22, 17-band va 9-ilova: piyodalar yo‘lkasi piyodalar o‘tish joyi bilan pandus orqali tutashadi; pandus kengligi kamida 1,0 m, bo‘ylama qiyaligi 1:12 (8%), ko‘ndalang qiyaligi 1:50; balandlik farqi 0,2 m va kam bo‘lsa qiyalik 10% gacha.",en:"SHNQ 2.07.02-22 cl. 17 and Annex 9: the sidewalk joins the crossing by a ramp at least 1.0 m wide, slope 1:12 (8%), cross slope 1:50; up to 10% where the drop is 0.2 m or less.",ru:"ШНК 2.07.02-22, п. 17 и прил. 9: тротуар сопрягается с переходом пандусом шириной не менее 1,0 м, уклон 1:12 (8%), поперечный 1:50; при перепаде до 0,2 м — до 10%."},
+  r:{uz:"Kengligi kamida 1,0 m, qiyaligi 1:12 hoshiya pandusini qurish (SHNQ 2.07.02-22)",en:"Build a curb ramp ≥1.0 m wide at 1:12 (SHNQ 2.07.02-22)",ru:"Устроить пандус шириной ≥1,0 м с уклоном 1:12 (ШНК 2.07.02-22)"}},
+ {c:"P16",ci:1.0,crf:0,src:"CMF yo‘q (foydalanish imkoniyati talabi) / no CMF (accessibility requirement)",n:{uz:"Taktil qoplama",en:"Tactile paving",ru:"Тактильная плитка"},o:std3(),
+  s:{uz:"SHNQ 2.07.02-22, 7, 23 va 48-bandlar: piyodalar o‘tish joyiga yaqinlashishda yo‘lak qoplamasi taktil va kontrast rangli bo‘lishi; pandus va zinalardan 0,6 m oldin ogohlantiruvchi taktil qoplama (3, 4, 6, 17–19-ilovalar). O‘zMSt 349:2024, F-ilova: svetoforli o‘tishda ovozli va taktil ishora.",en:"SHNQ 2.07.02-22 cl. 7, 23, 48: tactile and contrasting paving on approaches to crossings; warning tactile strip 0.6 m before ramps and steps (Annexes 3, 4, 6, 17–19). O‘zMSt 349:2024 Annex F: audible and tactile signals.",ru:"ШНК 2.07.02-22, п. 7, 23, 48: тактильное контрастное покрытие на подходах к переходу; предупреждающая полоса за 0,6 м до пандусов и лестниц (прил. 3, 4, 6, 17–19). O‘zMSt 349:2024, прил. F: звуковая и тактильная сигнализация."},
+  r:{uz:"O‘tish joyiga yaqinlashishda kontrast rangli taktil qoplama yotqizish (SHNQ 2.07.02-22)",en:"Lay contrasting tactile paving on the approaches (SHNQ 2.07.02-22)",ru:"Уложить контрастное тактильное покрытие на подходах (ШНК 2.07.02-22)"}},
+ {c:"P17",ci:3.5,crf:30,src:"FHWA-SA-18-041: restrict parking near intersections, CMF 0.70",n:{uz:"To‘xtash va to‘xtab turish taqiqi",en:"Parking prohibition",ru:"Запрет стоянки"},
+  o:[{v:1,uz:"Taqiq bor va bajariladi (o‘tish joyidan ≥10 m, chorrahada ≥30 m)",en:"Ban in place and observed (≥10 m from crossing, ≥30 m at junction)",ru:"Запрет есть и соблюдается (≥10 м от перехода, ≥30 м у перекрёстка)"},{v:0.5,uz:"Taqiq bor, lekin buziladi yoki masofa kam",en:"Ban exists but violated or distance short",ru:"Запрет есть, но нарушается или расстояние меньше"},{v:0,uz:"Avtomobillar o‘tish joyida yoki yonida turadi",en:"Vehicles stop on or next to the crossing",ru:"Автомобили стоят на переходе или рядом"}],
+  s:{uz:"Yo‘l harakati qoidalari (VM 12.04.2022 yildagi 172-son qarori), 91-band: piyodalar o‘tish joylarida va ulardan oldin 10 m dan kam masofada, qatnov qismlari kesishmalarida va kesishayotgan qatnov qismi chetiga 30 m dan kam masofada to‘xtash taqiqlanadi; 92-band: to‘xtash taqiqlangan joylarda to‘xtab turish ham taqiqlanadi.",en:"Traffic Rules (Cabinet Resolution No. 172 of 12.04.2022), cl. 91: stopping is banned on crossings and within 10 m before them, and at junctions within 30 m of the crossing carriageway edge; cl. 92: parking is banned wherever stopping is.",ru:"ПДД (Постановление КМ № 172 от 12.04.2022), п. 91: остановка запрещена на пешеходных переходах и ближе 10 м перед ними, на перекрёстках ближе 30 м от края пересекаемой проезжей части; п. 92: там же запрещена стоянка."},
+  r:{uz:"O‘tish joyidan 10 m (chorrahada 30 m) oralig‘ida to‘xtashni 3.27 belgisi / 1.4 chizig‘i bilan taqiqlash va nazorat qilish",en:"Ban stopping within 10 m (30 m at junctions) with sign 3.27 / marking 1.4 and enforce it",ru:"Запретить остановку в 10 м (у перекрёстка 30 м) знаком 3.27 / разметкой 1.4 и контролировать"}}
+];
+
+/* ===== O‘ZBEKISTON USULI (Yusupov M.N., magistrlik dissertatsiyasi, 1.10–1.13-jadvallar) ===== */
+const IND_UZ = [
+ {c:"U01",ci:4.50,num:"speed",n:{uz:"Tezlik chegarasi",en:"Speed limit",ru:"Ограничение скорости"},
+  o:[{v:1,uz:"≤60 km/soat",en:"≤60 km/h",ru:"≤60 км/ч"},{v:0,uz:">60 km/soat",en:">60 km/h",ru:">60 км/ч"}],
+  s:{uz:"Aholi punktlarida tezlik chegarasi 60 km/soat (VM 2023-yil 3-apreldagi 140-son qarori).",en:"Urban speed limit 60 km/h (Cabinet Resolution No. 140, 3 Apr 2023).",ru:"Ограничение в населённых пунктах 60 км/ч (Постановление КМ № 140 от 03.04.2023)."},
+  r:{uz:"Tezlikni 60 km/soatgacha cheklash va tezlikni pasaytiruvchi vositalar o‘rnatish",en:"Limit speed to 60 km/h and add traffic calming",ru:"Ограничить скорость до 60 км/ч, установить средства успокоения"}},
+ {c:"U02",ci:4.30,num:"width",n:{uz:"Zebra chiziqlari mavjudligi va standartga mosligi",en:"Zebra markings and compliance",ru:"Разметка «зебра» и соответствие"},
+  o:[{v:1,uz:"Kengligi 4–6 m",en:"Width 4–6 m",ru:"Ширина 4–6 м"},{v:0.5,uz:"Kengligi 3–4 m",en:"Width 3–4 m",ru:"Ширина 3–4 м"},{v:0,uz:"Kengligi <3 m yoki chiziq yo‘q",en:"Width <3 m or no marking",ru:"Ширина <3 м или нет разметки"}],
+  s:{uz:"GOST 23457-86, 3.2.17-band: o‘tish joyi kengligi soatiga har 500 piyodaga 1 m, lekin kamida 4 m. Kenglik 6 m dan kam bo‘lsa 1.14.1, 6 m va undan ko‘p bo‘lsa 1.14.2 chizig‘i; svetoforli o‘tishda 1.14.3. Piyoda oqimi kiritilsa, kerakli kenglik avtomatik hisoblanadi.",en:"GOST 23457-86, cl. 3.2.17: crossing width 1 m per 500 ped/h, at least 4 m. Marking 1.14.1 if under 6 m, 1.14.2 if 6 m or more; 1.14.3 at signalized crossings. Required width is computed when pedestrian flow is entered.",ru:"ГОСТ 23457-86, п. 3.2.17: ширина перехода 1 м на каждые 500 пеш./ч, но не менее 4 м. При ширине менее 6 м разметка 1.14.1, 6 м и более — 1.14.2; на регулируемых — 1.14.3. При вводе потока пешеходов требуемая ширина считается автоматически."},
+  r:{uz:"O‘tish joyini kerakli kenglikda (kamida 4 m, har 500 piyoda/soat uchun 1 m) 1.14.1 / 1.14.2 chizig‘i bilan qayta chizish",en:"Repaint the crossing at the required width (≥4 m, 1 m per 500 ped/h) with marking 1.14.1/1.14.2",ru:"Обновить разметку 1.14.1/1.14.2 требуемой ширины (≥4 м, 1 м на 500 пеш./ч)"}},
+ {c:"U03",ci:3.67,num:"lanes",n:{uz:"Kesib o‘tish uzunligi",en:"Crossing length",ru:"Длина перехода"},
+  o:[{v:1,uz:"4 ta va kam qator",en:"4 lanes or fewer",ru:"4 полосы и меньше"},{v:0.5,uz:"5–6 ta qator",en:"5–6 lanes",ru:"5–6 полос"},{v:0,uz:"6 tadan ko‘p qator",en:"More than 6 lanes",ru:"Более 6 полос"}],
+  s:{uz:"OTB CAREC qo‘llanmasi (2022): kesib o‘tish 4 qatordan oshsa, orolcha yoki bordyur kengaytmasi bilan qisqartiriladi.",en:"ADB CAREC manual (2022): beyond 4 lanes, shorten with refuge or curb extension.",ru:"Руководство CAREC АБР (2022): при более 4 полос сокращать островком или уширением."},
+  r:{uz:"Kesib o‘tish uzunligini qisqartirish: bordyur kengaytmasi yoki xavfsizlik orolchasi",en:"Shorten the crossing with curb extensions or a refuge island",ru:"Сократить длину перехода уширением тротуара или островком"}},
+ {c:"U04",ci:3.72,n:{uz:"Kutish vaqti",en:"Waiting time",ru:"Время ожидания"},
+  o:[{v:1,uz:"<45 s",en:"<45 s",ru:"<45 с"},{v:0.5,uz:"45–60 s",en:"45–60 s",ru:"45–60 с"},{v:0,uz:">60 s",en:">60 s",ru:">60 с"}],
+  s:{uz:"Kutish 45 s dan oshsa, qizilda o‘tish ko‘payadi (Modeling Pedestrian Temporal Violations at Signalized Crosswalks). Svetoforlida C − g, svetoforsizda HCM o‘rtacha kutishi bo‘yicha avtomatik.",en:"Waiting over 45 s increases red-light crossing. Auto: C − g (signalized) or HCM mean delay (unsignalized).",ru:"Ожидание более 45 с повышает переход на красный. Авто: C − g (регулируемый) или задержка HCM (нерегулируемый)."},
+  r:{uz:"Svetofor siklini qisqartirish yoki piyoda fazasini qo‘shish (kutish <45 s)",en:"Shorten the cycle or add a pedestrian phase (wait <45 s)",ru:"Сократить цикл или добавить пешеходную фазу (ожидание <45 с)"}},
+ {c:"U05",ci:4.80,n:{uz:"Yo‘l belgilari borligi va holati",en:"Road signs and condition",ru:"Дорожные знаки и состояние"},o:std3(),
+  s:{uz:"O‘z DSt 3283:2023: 5.16.1/5.16.2 «Piyodalar o‘tish joyi» belgilari (I o‘lcham, 600 mm), svetoforsiz o‘tish oldida 1.20 ogohlantiruvchi belgi; ko‘zi ojizlar ishlatadigan joyda 7.15 lavhasi. Joylashuvi GOST 23457-86, 2.6.22-band bo‘yicha: o‘tishning ikki tomonida.",en:"O‘z DSt 3283:2023: signs 5.16.1/5.16.2 “Pedestrian crossing” (size I, 600 mm), warning sign 1.20 before unsignalized crossings, plate 7.15 where blind pedestrians cross. Placement per GOST 23457-86 cl. 2.6.22, on both sides.",ru:"O‘z DSt 3283:2023: знаки 5.16.1/5.16.2 «Пешеходный переход» (типоразмер I, 600 мм), перед нерегулируемым переходом знак 1.20, табличка 7.15 где переходят слепые. Установка по ГОСТ 23457-86, п. 2.6.22, с обеих сторон."},
+  r:{uz:"5.16.1 / 5.16.2 (va kerak bo‘lsa 1.20) belgilarini O‘z DSt 3283:2023 bo‘yicha o‘rnatish yoki almashtirish",en:"Install or replace signs 5.16.1/5.16.2 (and 1.20 if needed) per O‘z DSt 3283:2023",ru:"Установить или заменить знаки 5.16.1/5.16.2 (и 1.20) по O‘z DSt 3283:2023"}},
+ {c:"U06",ci:3.80,n:{uz:"Svetofor mavjudligi va ishlashi",en:"Traffic signal and operation",ru:"Светофор и его работа"},
+  o:[{v:1,uz:"Mavjud, yaxshi ishlaydi",en:"Present, works well",ru:"Есть, работает исправно"},{v:0.5,uz:"Mavjud, yaxshi ishlamaydi",en:"Present, works poorly",ru:"Есть, работает плохо"},{v:0,uz:"Mavjud emas",en:"Not present",ru:"Отсутствует"}],
+  s:{uz:"GOST 23457-86: rostlanadigan chorrahadagi barcha o‘tish joylarida piyoda svetofori bo‘lishi shart (4.31), yashil ishora o‘chishidan oldin 3 s miltillaydi (4.35), svetofor o‘tish chegarasidan 1 m dan uzoq emas (4.21). Svetoforsiz joyda svetofor kerak bo‘ladi, agar 8 soat davomida asosiy yo‘lda ≥600 avt/soat (ajratuvchi tasmali yo‘lda ≥1000) va ≥150 piyoda/soat bo‘lsa (4.14, 2-shart). O‘zMSt 349:2024: piyoda svetofori, ko‘zi ojizlar uchun ovozli va taktil ishora (F-ilova).",en:"GOST 23457-86: every crossing at a signalized intersection needs a pedestrian signal (4.31), green flashes 3 s before ending (4.35), signal within 1 m of the crossing (4.21). An unsignalized site warrants a signal at ≥600 veh/h on the major road (≥1000 with a median) and ≥150 ped/h for 8 h (4.14, condition 2). O‘zMSt 349:2024: pedestrian signal, audible and tactile signals (Annex F).",ru:"ГОСТ 23457-86: все переходы на регулируемом перекрёстке оборудуются пешеходными светофорами (4.31), мигание зелёного 3 с (4.35), светофор не далее 1 м от перехода (4.21). На нерегулируемом светофор нужен при ≥600 авт./ч по главной (≥1000 с разделительной) и ≥150 пеш./ч в течение 8 ч (4.14, условие 2). O‘zMSt 349:2024: пешеходный светофор, звуковая и тактильная сигнализация (прил. F)."},
+  r:{uz:"Piyoda svetoforini o‘rnatish yoki ta’mirlash: 3 s miltillash, taymer, ovozli ishora (GOST 23457-86, O‘zMSt 349:2024)",en:"Install or repair the pedestrian signal: 3 s flashing green, countdown, audible signal (GOST 23457-86, O‘zMSt 349:2024)",ru:"Установить или отремонтировать пешеходный светофор: мигание 3 с, табло, звук (ГОСТ 23457-86, O‘zMSt 349:2024)"}},
+ {c:"U07",ci:4.19,n:{uz:"Yoritish",en:"Lighting",ru:"Освещение"},
+  o:[{v:1,uz:"Yetarli yoritilgan",en:"Adequately lit",ru:"Достаточно освещён"},{v:0.5,uz:"Yetarli emas",en:"Not enough",ru:"Недостаточно"},{v:0,uz:"Mavjud emas",en:"No lighting",ru:"Нет освещения"}],
+  s:{uz:"O‘z DSt 3644:2023, 6.18-band: yoritilganlik kunduzi ≥50 lx, kechqurun ≥20 lx, tunda ≥10 lx. 6.29-band: yaqinlashish yo‘lining yoritilgan uzunligi 40 km/soatda 50 m, 60 km/soatda 75 m, 90 km/soatda 150 m.",en:"O‘z DSt 3644:2023, cl. 6.18: illuminance ≥50 lx day, ≥20 lx evening, ≥10 lx night. Cl. 6.29: lit approach length 50 m at 40 km/h, 75 m at 60 km/h, 150 m at 90 km/h.",ru:"O‘z DSt 3644:2023, п. 6.18: освещённость днём ≥50 лк, вечером ≥20 лк, ночью ≥10 лк. П. 6.29: длина освещённого подхода 50 м при 40 км/ч, 75 м при 60 км/ч, 150 м при 90 км/ч."},
+  r:{uz:"O‘tish joyiga qo‘shimcha yoritish o‘rnatish",en:"Add crossing lighting",ru:"Добавить освещение перехода"}},
+ {c:"U08",ci:3.80,n:{uz:"Drenaj tizimi holati",en:"Drainage",ru:"Водоотвод"},
+  o:[{v:1,uz:"Drenaj mavjud",en:"Drainage present",ru:"Есть"},{v:0.5,uz:"Mavjud, lekin muammo bor",en:"Present with problems",ru:"Есть, но с проблемами"},{v:0,uz:"Drenaj mavjud emas",en:"No drainage",ru:"Нет"}],
+  s:{uz:"O‘z DSt 3644:2023, 6.17-band: qor va yomg‘ir suvi lotoklar orqali chetlatiladi, piyoda yo‘lagidagi lotoklar po‘lat panjara bilan yopiladi. OTB CAREC (2022): o‘tishda suv to‘planmasligi kerak.",en:"O‘z DSt 3644:2023, cl. 6.17: storm water drained by gutters; gutters on walkways covered with steel grates. ADB CAREC (2022): no ponding at the crossing.",ru:"O‘z DSt 3644:2023, п. 6.17: водоотвод лотками, лотки на пешеходных путях закрываются стальными решётками. CAREC (2022): без застоя воды."},
+  r:{uz:"Drenajni qurish yoki tozalash",en:"Build or clear drainage",ru:"Устроить или прочистить водоотвод"}},
+ {c:"U09",ci:3.02,n:{uz:"Nogironlar uchun infratuzilma",en:"Accessibility for disabled",ru:"Доступность для инвалидов"},
+  o:[{v:1,uz:"Mavjud (pandus, taktil plitka)",en:"Present (ramps, tactile)",ru:"Есть (пандус, тактильная плитка)"},{v:0.5,uz:"Mavjud, qoniqarsiz",en:"Present, unsatisfactory",ru:"Есть, неудовлетворительно"},{v:0,uz:"Mavjud emas",en:"Not present",ru:"Нет"}],
+  s:{uz:"O‘z DSt 3644:2023, 6.7–6.9-bandlar: kengligi 1 m pandus, ko‘tarilish oldida kamida 1,8 m gorizontal maydon, qiyalik A-ilova bo‘yicha. O‘zMSt 349:2024, F-ilova: ko‘zi ojizlar uchun ovozli va taktil ishora. ShNQ 2.07.02-22: bordyur pandusi va taktil qoplama.",en:"O‘z DSt 3644:2023, cl. 6.7–6.9: 1 m wide ramp, ≥1.8 m landing, slope per Annex A. O‘zMSt 349:2024, Annex F: audible and tactile signals. ShNQ 2.07.02-22: curb ramps and tactile paving.",ru:"O‘z DSt 3644:2023, п. 6.7–6.9: пандус шириной 1 м, площадка ≥1,8 м, уклон по прил. A. O‘zMSt 349:2024, прил. F: звуковая и тактильная сигнализация. ШНК 2.07.02-22: пандусы и тактильное покрытие."},
+  r:{uz:"Bordyur pandusi va taktil qoplama qurish",en:"Build curb ramps and tactile paving",ru:"Устроить пандусы и тактильное покрытие"}},
+ {c:"U10",ci:3.56,n:{uz:"Yo‘l qoplamasi holati",en:"Pavement condition",ru:"Состояние покрытия"},
+  o:[{v:1,uz:"Tekis, barqaror",en:"Even, stable",ru:"Ровное, устойчивое"},{v:0.5,uz:"Muammolar bor",en:"Some problems",ru:"Есть дефекты"},{v:0,uz:"Jiddiy buzilishlar",en:"Serious damage",ru:"Серьёзные разрушения"}],
+  s:{uz:"Qoplama silliq, qattiq, barqaror va yomg‘irda ham sirpanmas bo‘lishi kerak.",en:"Surface even, firm, stable and slip-resistant in rain.",ru:"Покрытие ровное, прочное, нескользкое в дождь."},
+  r:{uz:"O‘tish qoplamasini ta’mirlash",en:"Repair the crossing surface",ru:"Отремонтировать покрытие перехода"}},
+ {c:"U11",ci:4.01,n:{uz:"Xavfsizlik orolchasi",en:"Refuge island",ru:"Островок безопасности"},
+  o:[{v:1,uz:"Mavjud, standartga mos (1,8–2,0 m)",en:"Present, compliant (1.8–2.0 m)",ru:"Есть, по стандарту (1,8–2,0 м)"},{v:0.5,uz:"Mavjud, standartga mos emas",en:"Present, not compliant",ru:"Есть, не по стандарту"},{v:0,uz:"Mavjud emas",en:"Not present",ru:"Нет"}],
+  s:{uz:"GOST 23457-86, 5.3.5-band: orolcha har bir harakat tasmasida ≥400 avt/soat bo‘lganda va trotuardan orolchagacha ≥7,5 m (to‘siqli orolchada ≥10,5 m) bo‘lganda quriladi. OTB CAREC (2022): kengligi 1,8–2,0 m. O‘tish uzunligi 15 m dan kam bo‘lsa yoki tasma yuklamasi 400 avt/soatdan kam bo‘lsa, indikator avtomatik «talab qilinmaydi».",en:"GOST 23457-86, cl. 5.3.5: a refuge is required at ≥400 veh/h per lane and ≥7.5 m from curb to island (≥10.5 m with barriers). ADB CAREC (2022): 1.8–2.0 m wide. Auto N/A when crossing is under 15 m or lane flow under 400 veh/h.",ru:"ГОСТ 23457-86, п. 5.3.5: островок устраивается при ≥400 авт./ч на полосу и расстоянии от тротуара ≥7,5 м (≥10,5 м с ограждением). CAREC (2022): ширина 1,8–2,0 м. Авто «не требуется» при длине перехода <15 м или нагрузке <400 авт./ч на полосу."},
+  r:{uz:"Kengligi 1,8–2,0 m xavfsizlik orolchasini qurish yoki moslash",en:"Build or upgrade a 1.8–2.0 m refuge island",ru:"Устроить или привести островок к 1,8–2,0 м"}}
+];
+const GROUPS_UZ = [
+  {id:"u1",codes:["U01","U02","U03"],uz:"Harakat rejimi va geometriya",en:"Speed and geometry",ru:"Режим и геометрия",s:{uz:"Geometriya",en:"Geometry",ru:"Геометрия"}},
+  {id:"u2",codes:["U04","U05","U06"],uz:"Boshqaruv vositalari",en:"Traffic control",ru:"Средства регулирования",s:{uz:"Boshqaruv",en:"Control",ru:"Регулир."}},
+  {id:"u3",codes:["U07","U08","U10"],uz:"Ekspluatatsiya holati",en:"Maintenance",ru:"Эксплуатация",s:{uz:"Ekspluatatsiya",en:"Maintenance",ru:"Эксплуат."}},
+  {id:"u4",codes:["U09","U11"],uz:"Inklyuzivlik va himoya",en:"Inclusiveness and refuge",ru:"Инклюзивность и защита",s:{uz:"Inklyuzivlik",en:"Inclusive",ru:"Инклюзив."}}];
+const METHODS={uz:{ind:IND_UZ,groups:GROUPS_UZ,cuts:[85,70,55,40,25]},ahmed:{ind:IND_AH,groups:GROUPS_AH,cuts:[80,60,40,20,0]}};
+let IND=IND_AH, GROUPS=GROUPS_AH;
+const BYC = Object.fromEntries(IND_AH.concat(IND_UZ).map(x=>[x.c,x]));
+const methodOf=s=>s&&s.method?s.method:(s&&s.scores&&Object.keys(s.scores).some(k=>k[0]==="U")?"uz":"ahmed");
+function setMethod(m){S.method="ahmed"; IND=METHODS[S.method].ind; GROUPS=METHODS[S.method].groups}
+const MS=()=>S.sites.filter(s=>methodOf(s)===S.method);
+
+const GRADES = {
+  A:{range:"80–100",uz:["A’lo holat, aksariyat piyoda o‘tish infratuzilmasi mavjud","Juda kam yaxshilash talab etiladi"],en:["Excellent: most crossing facilities are present","Very few improvements needed"],ru:["Отлично: большинство элементов перехода имеются","Требуются минимальные улучшения"]},
+  B:{range:"60–79",uz:["Yaxshi holat, asosiy elementlarning ko‘pi mavjud","Ba’zi yaxshilashlar talab etiladi"],en:["Good: most key elements are present","Some improvements needed"],ru:["Хорошо: большинство основных элементов есть","Нужны некоторые улучшения"]},
+  C:{range:"40–59",uz:["O‘rtacha holat, infratuzilma bor, lekin takomillashtirish kerak","Ayrim yaxshilashlar talab etiladi"],en:["Average: facilities exist but need upgrading","Several improvements needed"],ru:["Средне: элементы есть, но требуют доработки","Нужен ряд улучшений"]},
+  D:{range:"20–39",uz:["Yomon holat, muhim elementlar yetishmaydi","Jiddiy yaxshilashlar talab etiladi"],en:["Poor: important elements are missing","Major improvements needed"],ru:["Плохо: не хватает важных элементов","Нужны серьёзные улучшения"]},
+  E:{range:"1–19",uz:["Juda yomon holat, juda kam element mavjud","Keng qamrovli yaxshilashlar talab etiladi"],en:["Very poor: very few elements present","Extensive improvements needed"],ru:["Очень плохо: элементов очень мало","Нужны масштабные улучшения"]},
+  F:{range:"0",uz:["Eng yomon holat, piyoda o‘tish jihozlari deyarli yo‘q","To‘liq qayta ko‘rib chiqish kerak"],en:["Worst: almost no crossing facilities","Complete redesign required"],ru:["Наихудшее: элементов перехода почти нет","Требуется полная реконструкция"]}};
+const CUT_PRESETS={article:[80,60,40,20,0],custom:[85,70,55,40,25]};
+const cuts=(m)=>{m=m||(typeof S!=="undefined"&&S?S.method:"uz")||"uz"; const c=(typeof S!=="undefined"&&S&&S.cutsBy&&Array.isArray(S.cutsBy[m]))?S.cutsBy[m]:METHODS[m].cuts; return c};
+const gradeOf = (p,m) => {const [a,b,c,d,e]=cuts(m); return p>=a?"A":p>=b?"B":p>=c?"C":p>=d?"D":(e>0?p>=e:p>0)?"E":"F"};
+function rangeOf(g){const [a,b,c,d,e]=cuts(); const r={A:`${a}–100`,B:`${b}–${a-1}`,C:`${c}–${b-1}`,D:`${d}–${c-1}`,E:`${e>0?e:1}–${d-1}`,F:e>0?`0–${e-1}`:"0"}; return r[g]}
+const GLABEL={uz:["Juda yaxshi","Yaxshi","Qoniqarli","Yomon","Juda yomon","Xavfli"],en:["Very good","Good","Satisfactory","Poor","Very poor","Dangerous"],ru:["Очень хорошо","Хорошо","Удовлетворительно","Плохо","Очень плохо","Опасно"]};
+const typeTxt=s=>[s.region,s.district,s.village,s.control?t("ctrl_"+s.control):"",t("typeShort_"+s.type)].filter(Boolean).join(", ");
+const glabel=g=>(GLABEL[S.lang]||GLABEL.uz)["ABCDEF".indexOf(g)];
+
+/* Namuna: Excel shablondagi Putrajaya (Malayziya) 4 ta o‘tish joyi */
+const SAMPLE = [
+ ["Ministry of Domestic Trade intersection","intersection",[1,1,1,.5,.5,1,.5,1,1,1,1,.5,1,1,.5,0,1]],
+ ["Midblock crossing – Ministry of Home Affairs","midblock",[1,1,1,.5,1,1,.5,1,1,1,.5,0,1,1,.5,0,1]],
+ ["Menara Prisma intersection crossing","intersection",[1,1,1,.5,.5,1,0,1,0,1,0,0,1,.5,1,0,1]],
+ ["Midblock crossing – Putrajaya Corporation","midblock",[1,1,1,.5,1,1,.5,.5,.5,0,0,0,0,.5,1,0,1]]];
+
+const UZ_SAMPLE=()=>({id:"uzs1",method:"uz",sample:true,name:"Amir Temur – Alisher Navoiy – Shahrisabz",region:"Toshkent shahri",control:"sig",type:"x4",date:"2025-05-01",lat:"",lon:"",scores:{U01:1,U02:0.5,U03:0,U04:0,U05:1,U06:0.5,U07:1,U08:0.5,U09:0,U10:0.5,U11:0.5}});
+/* ===================== MATN (UZ/EN/RU) ===================== */
+const T = {
+ uz:{title:"Chorrahalarda piyodalar",subtitle:"Xizmat darajasini baholash",tAssess:"Baholash",tSites:"Obyektlar",tCharts:"Tahlil",tTable:"Jadval",tSettings:"Sozlama",tMap:"Xarita",mapLegend:"PCLOS darajalari",cutsTitle:"Toifa chegaralari (PCLOS%)",cutsNote:"A, B, C, D, E toifalarining quyi chegarasi. F – qolgan qism.",presetArticle:"Maqola (80/60/40/20)",presetCustom:"Xaritangiz (85/70/55/40/25)",mapTitle:"GIS xarita",mapNote:"Belgi rangi PCLOS toifasini bildiradi. Belgini bosing: nom, PCLOS% va toifa. Shartli belgilarni ochish/yopish uchun «PCLOS darajalari»ni bosing.",noCoords:"Koordinatasi yo‘q obyektlar (xaritada ko‘rinmaydi). Tahrirlash orqali GPS qo‘shing:",noneOnMap:"Hali koordinatali obyekt yo‘q. Yangi baholashda joylashuv avtomatik olinadi.",gisExport:"GIS’ga eksport",gisNote:"GeoJSON: QGIS, ArcGIS, geojson.io. KML: Google Earth (ranglari bilan). ZIP ichida GeoJSON, KML, CSV va QGIS uslub fayli (.qml) bor: QGIS’da qatlamga uslubni yuklasangiz, ranglar A–F bo‘yicha avtomatik chiqadi.",zipAll:"Hammasi (ZIP)",
+  name:"Obyekt nomi",namePh:"Masalan: Amir Temur – Navoiy chorrahasi",type:"Chorraha shakli",region:"Viloyat",shape_x4:"To‘rt tarmoqli (X-simon)",shape_t3:"Uch tarmoqli (T yoki Y-simon)",shape_multi:"Ko‘p tarmoqli (5 va undan ko‘p)",shape_round:"Aylanma harakatli",control:"Boshqaruv turi",ctrl_sig:"Svetoforli (tartibga solinadigan)",ctrl_btn:"Chaqiruv tugmali piyoda svetofori",ctrl_uns:"Svetoforsiz (tartibga solinmaydigan)",ctrl_reg:"Regulyovchi (YPX xodimi) boshqaradi",typeShort_x4:"X-simon",typeShort_t3:"T-simon",typeShort_multi:"Ko‘p tarmoqli",typeShort_round:"Aylanma",typeShort_intersection:"Chorraha",typeShort_midblock:"Chorrahalar orasida",ctrlNeed:"Avval boshqaruv turini tanlang: svetoforli yoki svetoforsiz. Baholash usuli shunga qarab tanlanadi.",hcmTitle:"Harakat sharoiti (kutish vaqti, HCM)",hcmSigNote:"Svetoforli chorraha: piyodaning o‘rtacha kutish vaqti d = (C − g)² / 2C. Qo‘shimcha ma’lumot kiritilsa, HCM 2010 piyoda LOS balli ham hisoblanadi.",hcmUnsNote:"Svetoforsiz chorraha: piyoda transport oqimidagi yetarli oraliqni (kritik interval) kutadi, haydovchilarning yo‘l berishi hisobga olinadi (HCM 2010, 19-bob).",cycle:"Svetofor sikli C (s)",gwalk:"Piyodaga yashil g (s)",vturn:"O‘ngga/chapga buriluvchilar (avt/soat)",n15:"Asosiy yo‘l oqimi (avt/15 daq)",v85:"V85 tezlik (km/soat)",flow:"Kesib o‘tiladigan yo‘l oqimi (avt/soat, ikki yo‘nalish)",yieldp:"Yo‘l beruvchi haydovchilar (%)",clen:"O‘tish uzunligi (m)",clenPh:"tasmalar × 3,5",delay:"O‘rtacha kutish",losDelay:"Kutish bo‘yicha LOS",losScore:"HCM 2010 balli",tcrit:"Kritik interval",pdelayed:"Kutishga majbur piyodalar",infra:"Infratuzilma (PCLOS)",oper:"Harakat sharoiti (HCM)",na:"Talab qilinmaydi (hisobga olinmaydi)",naAuto:"Chorraha turi va harakat tasmalari soniga qarab ba’zi indikatorlar avtomatik «talab qilinmaydi» deb belgilandi; kerak bo‘lsa o‘zgartiring.",mapBy:"Rang bo‘yicha",hcmLegend:"svetoforli / svetoforsiz",sec:"s",date:"Sana",gps:"Joylashuv",getGps:"GPS olish",gpsFail:"Joylashuv olinmadi. Telefonda geolokatsiyani yoqing yoki koordinatani qo‘lda kiriting.",gpsWait:"Joylashuv aniqlanmoqda…",gpsOk:"Joylashuv avtomatik olindi",acc:"aniqlik",onMap:"Xaritada ko‘rish",
+  measure:"O‘lchovlar",speed:"Ruxsat etilgan tezlik (km/soat)",width:"Kenglik (m)",lanes:"Harakat tasmalari soni",measureNote:"Raqam kiritsangiz, tegishli indikator avtomatik baholanadi.",
+  choose:"Tanlang…",std:"Standart",calc:"Hisobla",answered:"baholandi",missing:"Baholanmagan indikatorlar 0 ball deb olinadi.",
+  result:"Natija",sum:"Jami PCLOS (ΣCi·Pi)",ideal:"Ideal (ΣCi)",pct:"PCLOS%",desc:"Tavsif",need:"Zarur yaxshilash",recs:"Tavsiyalar",recsNote:"Ta’siri bo‘yicha saralangan: indikator 1 ballga yetkazilsa PCLOS% qancha oshadi.",noRecs:"Barcha indikatorlar standartga mos.",
+  save:"Saqlash",update:"Yangilash",newA:"Yangi baholash",saved:"Saqlandi",updated:"Yangilandi",
+  sitesTitle:"Baholangan obyektlar",empty:"Hali obyekt yo‘q. «Baholash» bo‘limida birinchisini qo‘shing.",sample:"namuna",loadSample:"Namunani yuklash",clearAll:"Hammasini o‘chirish",confirmQ:"Ishonchingiz komilmi?",yes:"Ha, o‘chirish",no:"Bekor",del:"O‘chirish",edit:"Tahrirlash",deleted:"O‘chirildi",
+  importX:"Excel’dan import",importJ:"Zaxiradan tiklash",exportJ:"Zaxira (JSON)",imported:"Import qilindi: ",importFail:"Faylni o‘qib bo‘lmadi",
+  chartsTitle:"Grafiklar va bog‘liqlik",needSites:"Grafiklar uchun kamida 1 ta obyekt kerak.",
+  c1:"Obyektlar bo‘yicha PCLOS%",c1n:"Chiziqlar toifa chegaralari: 20, 40, 60, 80%.",
+  c2:"Indikatorlar hissasi",c2n:"Ko‘k: olingan ball (Ci·Pi). Och rang: yo‘qotilgan ball Ci·(1−Pi).",gotten:"Olingan Ci·Pi",lost:"Yo‘qotilgan",
+  c3:"Guruhlar bo‘yicha profil",c3n:"Har bir guruhda olingan ballning ideal ballga nisbati, %.",
+  c4:"Indikator ballari xaritasi (Pi)",c5:"Indikatorlar muhimligi (Ci)",c5n:"Ci = 1 + 4·CRF/48, CRF – piyodalar bilan YTH kamayishi (FHWA, IIHS).",
+  c6:"Muhimlik va holat tahlili (IPA)",c6n:"X: Ci (muhimlik), Y: obyektlar bo‘yicha o‘rtacha Pi (holat). Chiziqlar o‘rtacha qiymatlar.",
+  q1:"Ustuvor yaxshilash",q2:"Shu holatni saqlash",q3:"Past ustuvorlik",q4:"Ortiqcha resurs",
+  c7:"Yaxshilash salohiyati",c7n:"Indikator 1 ballga yetkazilsa PCLOS% o‘rtacha necha foizga oshadi: ΔPCLOS% = Ci·(1−Pi)/ΣCi·100.",
+  c8:"Indikatorlar o‘zaro korrelyatsiyasi",c8n:"Pirson r obyektlar bo‘yicha. «—»: indikator barcha obyektlarda bir xil (dispersiya 0). Ishonchli xulosa uchun 10+ obyekt tavsiya etiladi.",
+  c9:"Indikator va PCLOS% bog‘liqligi",c9n:"Har bir indikator Pi ning PCLOS% bilan korrelyatsiyasi (r).",
+  c10:"Ikki o‘zgaruvchi bog‘liqligi",c10n:"O‘qlarni tanlang. Chiziq: chiziqli regressiya.",xAxis:"X o‘qi",yAxis:"Y o‘qi",
+  c11:"Toifalar taqsimoti",site:"Obyekt",all:"Barcha obyektlar",mean:"O‘rtacha",
+  tableTitle:"Natijalar jadvali",exportX:"Excel yuklab olish",exportC:"CSV yuklab olish",copy:"Nusxa olish",copied:"Jadval nusxalandi. Excel’ga joylashtiring.",dlFail:"Bu oynada yuklab olish bloklangan. «Nusxa olish» tugmasidan foydalaning yoki ilovaning o‘zida oching.",
+  grade:"Toifa",total:"Jami",
+  settingsTitle:"Sozlamalar",indicator:"Indikator",ciTitle:"Indikator koeffitsiyentlari (Ci)",ciNote:"Default qiymatlar maqoladan (n=150 respondent). O‘z so‘rovnomangizdagi o‘rtacha Likert qiymatini kiritsangiz, u ishlatiladi.",def:"Default",own:"O‘zingizniki",active:"Faol",reset:"Defaultga qaytarish",resetDone:"Default Ci tiklandi",
+  method:"Metodika",mUz:"O‘zbekiston (11)",ciNoteCrf:"Og‘irliklar so‘rovsiz, dalillar asosida olingan: har bir chora piyodalar bilan bo‘ladigan YTH ni necha foizga kamaytirishi (CRF, FHWA CMF Clearinghouse, IIHS). CRF ma’lum bo‘lmagan me’yoriy talablar (foydalanish imkoniyati, ekspluatatsiya) eng kam og‘irlik Ci = 1 oladi.",critRule:"Hal qiluvchi talablar: tezlik ≤60 km/soat (P01), zarur joyda piyodalar svetofori (P10), piyodalar o‘tish joyi chizig‘i (P02). Ulardan biri 0 ball olsa, PCLOS% qancha bo‘lishidan qat’i nazar daraja D dan yuqori bo‘lmaydi.",critNote:"Hal qiluvchi talab buzilgan, shuning uchun daraja D bilan cheklandi:",district:"Tuman / shahar",village:"Qishloq / shaharcha / mahalla",villagePh:"Ro‘yxatdan tanlang yoki yozing",regionFirst:"Avval viloyatni tanlang",ciNoteUz:"Default qiymatlar magistrlik dissertatsiyasidagi mutaxassislar so‘rovidan. O‘z so‘rovingiz natijasini kiritsangiz yoki pastdagi so‘rovdan qo‘llasangiz, u ishlatiladi.",mAh:"Ahmed 2021 (17)",peds:"Piyodalar oqimi (piyoda/soat)",reqW:"Kerakli kenglik",walkT:"Yo‘lga chiqish vaqti (s)",vdes:"Loyiha tezligi",vStd:"1,07 m/s (standart)",vOld:"0,84 m/s (keksalar, bolalar)",clenS:"O‘tish uzunligi (m)",gtTitle:"Piyoda yashil vaqti",gtOk:"yetarli",gtBad:"yetarli emas",gtRec:"Piyoda yashil vaqtini kamida {g} s gacha uzaytirish (G = WALK + L/V)",waitAuto:"Kutish vaqti",sigWarrant:"GOST 23457-86 bo‘yicha bu joyda svetofor kerak (≥600 avt/soat va ≥150 piyoda/soat).",svTitle:"Mutaxassislar so‘rovi (Ci)",svNote:"Har bir mutaxassis indikator muhimligini 1–5 ball bilan baholaydi. O‘rtacha qiymat Ci bo‘ladi. «Ci sifatida qo‘llash» tugmasi uni yuqoridagi jadvalga yozadi.",svAdd:"+ Mutaxassis",svDel:"− Oxirgisi",svApply:"Ci sifatida qo‘llash",svCsv:"So‘rovni CSV yuklash",svMean:"O‘rtacha",svN:"n",svExp:"M",svApplied:"Ci yangilandi",svEmpty:"Hali mutaxassis qo‘shilmagan.",methodTextUz:"O‘zbekiston metodikasi 11 indikatordan iborat (magistrlik dissertatsiyasi asosida). Har bir indikator joyida kuzatiladi va amaldagi O‘zbekiston me’yorlari bilan solishtirilib 0, 0,5 yoki 1 ball (Pi) oladi. Ci – indikator muhimligi (mutaxassislar 1–5 bahosining o‘rtachasi). Talab qilinmaydigan indikatorlar hisobdan chiqariladi.",srcUz:"Manbalar: VM 03.04.2023 yildagi 140-son qarori; O‘z DSt 3644:2023 (piyodalar o‘tish joylari); O‘z DSt 3283:2023 (yo‘l belgilari); O‘zMSt 349:2024 (yo‘l svetoforlari); GOST 23457-86 (texnik vositalarni qo‘llash qoidalari); OTB CAREC yo‘l xavfsizligi qo‘llanmasi (2022); HCM 2010; Ahmed va boshq. (2021).",methodText:"Har bir indikator joyida kuzatilib standart bilan solishtiriladi va 0, 0,5 yoki 1 ball (Pi) oladi. Ci – indikatorning xavfsizlikka ta’siri bo‘yicha og‘irligi: Ci = 1 + 4·CRF/48 (CRF – piyodalar bilan YTH kamayishi, %). Talab qilinmaydigan indikator (N/A) ΣCi dan chiqariladi. Harakat sharoiti HCM 2010 bo‘yicha: svetoforli chorrahada d=(C−g)²/2C, LOS: ≤10/20/30/40/60 s; svetoforsizda kritik interval tc=L/1,07+3 s va haydovchilar yo‘l berishi hisobga olinadi, LOS: ≤5/10/20/30/45 s.",
+  gradeTable:"Toifalar jadvali",range:"Oraliq",source:"Manba",theme:"Mavzu",themeAuto:"Avto",themeLight:"Yorug‘",themeDark:"Qorong‘i",
+  about:"Ma’lumotlar faqat shu qurilmada saqlanadi.",groupsShort:["Geometriya","Nazorat","Yuza","Inklyuzivlik"]},
+ en:{title:"Pedestrians at intersections",subtitle:"Level of Service assessment",tAssess:"Assess",tSites:"Sites",tCharts:"Analysis",tTable:"Table",tSettings:"Settings",tMap:"Map",mapLegend:"PCLOS grades",cutsTitle:"Grade limits (PCLOS%)",cutsNote:"Lower limit of grades A, B, C, D, E. F is the rest.",presetArticle:"Paper (80/60/40/20)",presetCustom:"Your map (85/70/55/40/25)",mapTitle:"GIS map",mapNote:"Point colour shows the PCLOS grade. Tap a point for name, PCLOS% and grade.",noCoords:"Sites without coordinates (not on the map). Add GPS via Edit:",noneOnMap:"No sites with coordinates yet. New assessments get the location automatically.",gisExport:"Export to GIS",gisNote:"GeoJSON: QGIS, ArcGIS, geojson.io. KML: Google Earth (with colours). The ZIP holds GeoJSON, KML, CSV and a QGIS style file (.qml): load the style on the layer in QGIS and points are coloured by grade A–F.",zipAll:"All (ZIP)",
+  name:"Site name",namePh:"e.g. Main St & 5th Ave",type:"Intersection layout",region:"Region",shape_x4:"Four-leg (X)",shape_t3:"Three-leg (T or Y)",shape_multi:"Multi-leg (5+)",shape_round:"Roundabout",control:"Control type",ctrl_sig:"Signalized",ctrl_btn:"Pedestrian push-button signal",ctrl_uns:"Unsignalized (uncontrolled)",ctrl_reg:"Controlled by traffic officer",typeShort_x4:"Four-leg",typeShort_t3:"T-leg",typeShort_multi:"Multi-leg",typeShort_round:"Roundabout",typeShort_intersection:"Intersection",typeShort_midblock:"Midblock",ctrlNeed:"Choose the control type first: signalized or unsignalized. The method depends on it.",hcmTitle:"Operating conditions (delay, HCM)",hcmSigNote:"Signalized: mean pedestrian delay d = (C − g)² / 2C. With extra inputs the HCM 2010 pedestrian LOS score is also computed.",hcmUnsNote:"Unsignalized: the pedestrian waits for an adequate gap (critical headway); driver yielding is included (HCM 2010, Ch. 19).",cycle:"Cycle length C (s)",gwalk:"Pedestrian green g (s)",vturn:"Turning vehicles (veh/h)",n15:"Major street flow (veh/15 min)",v85:"85th pct speed (km/h)",flow:"Crossed road flow (veh/h, both directions)",yieldp:"Drivers yielding (%)",clen:"Crossing length (m)",clenPh:"lanes × 3.5",delay:"Mean delay",losDelay:"LOS by delay",losScore:"HCM 2010 score",tcrit:"Critical headway",pdelayed:"Pedestrians delayed",infra:"Infrastructure (PCLOS)",oper:"Operations (HCM)",na:"Not required (excluded)",naAuto:"Some indicators were set to “not required” from the control type and lane count; change if needed.",mapBy:"Colour by",hcmLegend:"signalized / unsignalized",sec:"s",date:"Date",gps:"Location",getGps:"Get GPS",gpsFail:"Could not get location. Turn on location services or enter coordinates manually.",gpsWait:"Getting location…",gpsOk:"Location filled automatically",acc:"accuracy",onMap:"View on map",
+  measure:"Measurements",speed:"Speed limit (km/h)",width:"Width (m)",lanes:"Number of lanes",measureNote:"Typing a number scores the matching indicator automatically.",
+  choose:"Choose…",std:"Standard",calc:"Calculate",answered:"scored",missing:"Unscored indicators count as 0.",
+  result:"Result",sum:"Total PCLOS (ΣCi·Pi)",ideal:"Ideal (ΣCi)",pct:"PCLOS%",desc:"Description",need:"Improvement need",recs:"Recommendations",recsNote:"Sorted by impact: how much PCLOS% rises if the indicator reaches 1.",noRecs:"All indicators meet the standard.",
+  save:"Save",update:"Update",newA:"New assessment",saved:"Saved",updated:"Updated",
+  sitesTitle:"Assessed sites",empty:"No sites yet. Add the first one under Assess.",sample:"sample",loadSample:"Load sample",clearAll:"Delete all",confirmQ:"Are you sure?",yes:"Yes, delete",no:"Cancel",del:"Delete",edit:"Edit",deleted:"Deleted",
+  importX:"Import from Excel",importJ:"Restore backup",exportJ:"Backup (JSON)",imported:"Imported: ",importFail:"Could not read the file",
+  chartsTitle:"Charts and relationships",needSites:"Add at least 1 site to see charts.",
+  c1:"PCLOS% by site",c1n:"Lines mark grade limits: 20, 40, 60, 80%.",
+  c2:"Indicator contributions",c2n:"Blue: points earned (Ci·Pi). Light: points lost Ci·(1−Pi).",gotten:"Earned Ci·Pi",lost:"Lost",
+  c3:"Profile by group",c3n:"Earned points as a share of ideal points in each group, %.",
+  c4:"Indicator score map (Pi)",c5:"Indicator importance (Ci)",c5n:"Ci = 1 + 4·CRF/48, CRF = pedestrian crash reduction (FHWA, IIHS).",
+  c6:"Importance–performance analysis (IPA)",c6n:"X: Ci (importance), Y: mean Pi across sites (performance). Lines show the means.",
+  q1:"Priority improvement",q2:"Keep up the good work",q3:"Low priority",q4:"Possible over-investment",
+  c7:"Improvement potential",c7n:"Mean PCLOS% gain if the indicator reaches 1: ΔPCLOS% = Ci·(1−Pi)/ΣCi·100.",
+  c8:"Indicator correlation matrix",c8n:"Pearson r across sites. “—”: indicator is identical at all sites (zero variance). 10+ sites recommended for reliable results.",
+  c9:"Indicator vs PCLOS%",c9n:"Correlation (r) of each indicator Pi with PCLOS%.",
+  c10:"Two-variable relationship",c10n:"Pick the axes. Line: linear regression.",xAxis:"X axis",yAxis:"Y axis",
+  c11:"Grade distribution",site:"Site",all:"All sites",mean:"Mean",
+  tableTitle:"Results table",exportX:"Download Excel",exportC:"Download CSV",copy:"Copy",copied:"Table copied. Paste it into Excel.",dlFail:"Downloads are blocked in this window. Use Copy, or open the installed app.",
+  grade:"Grade",total:"Total",
+  settingsTitle:"Settings",indicator:"Indicator",ciTitle:"Indicator coefficients (Ci)",ciNote:"Defaults come from the paper (n=150 respondents). Enter your own survey’s mean Likert value to override.",def:"Default",own:"Yours",active:"Active",reset:"Reset to default",resetDone:"Default Ci restored",
+  method:"Method",mUz:"Uzbekistan (11)",ciNoteCrf:"Weights are evidence-based, no survey: the share by which each measure reduces pedestrian crashes (CRF, FHWA CMF Clearinghouse, IIHS). Normative requirements without a known CRF (accessibility, maintenance) get the minimum weight Ci = 1.",critRule:"Critical requirements: speed ≤60 km/h (P01), pedestrian signal where required (P10), crossing marking (P02). If any scores 0, the grade cannot be better than D whatever the PCLOS%.",critNote:"A critical requirement fails, so the grade is capped at D:",district:"District / city",village:"Village / town / mahalla",villagePh:"Pick from list or type",regionFirst:"Choose the region first",ciNoteUz:"Defaults come from the expert survey in the master’s dissertation. Values you enter, or apply from the survey below, are used instead.",mAh:"Ahmed 2021 (17)",peds:"Pedestrian flow (ped/h)",reqW:"Required width",walkT:"Start-up time (s)",vdes:"Design speed",vStd:"1.07 m/s (standard)",vOld:"0.84 m/s (elderly, children)",clenS:"Crossing length (m)",gtTitle:"Pedestrian green time",gtOk:"sufficient",gtBad:"insufficient",gtRec:"Extend pedestrian green to at least {g} s (G = WALK + L/V)",waitAuto:"Waiting time",sigWarrant:"Per GOST 23457-86 this site warrants a signal (≥600 veh/h and ≥150 ped/h).",svTitle:"Expert survey (Ci)",svNote:"Each expert rates the importance of every indicator from 1 to 5. The mean becomes Ci. “Apply as Ci” writes it into the table above.",svAdd:"+ Expert",svDel:"− Remove last",svApply:"Apply as Ci",svCsv:"Download survey CSV",svMean:"Mean",svN:"n",svExp:"E",svApplied:"Ci updated",svEmpty:"No experts added yet.",methodTextUz:"The Uzbekistan method has 11 indicators (based on the master’s dissertation). Each indicator is observed on site, compared with current Uzbek norms and scored 0, 0.5 or 1 (Pi). Ci is the indicator importance (mean of expert 1–5 ratings). Not-required indicators are excluded.",srcUz:"Sources: Cabinet Resolution No. 140 of 03.04.2023; O‘z DSt 3644:2023 (pedestrian crossings); O‘z DSt 3283:2023 (road signs); O‘zMSt 349:2024 (traffic signals); GOST 23457-86 (rules for traffic control devices); ADB CAREC Road Safety Manual (2022); HCM 2010; Ahmed et al. (2021).",methodText:"Each indicator is observed on site, compared with the standard and scored 0, 0.5 or 1 (Pi). Ci is the safety-evidence weight: Ci = 1 + 4·CRF/48 (CRF = pedestrian crash reduction, %). Not-required indicators (N/A) are removed from ΣCi. Operations follow HCM 2010: signalized d=(C−g)²/2C, LOS ≤10/20/30/40/60 s; unsignalized uses critical headway tc=L/1.07+3 s with driver yielding, LOS ≤5/10/20/30/45 s.",
+  gradeTable:"Grade table",range:"Range",source:"Source",theme:"Theme",themeAuto:"Auto",themeLight:"Light",themeDark:"Dark",
+  about:"Data is stored only on this device.",groupsShort:["Geometry","Control","Surface","Inclusive"]},
+ ru:{title:"Пешеходы на перекрёстках",subtitle:"Оценка уровня обслуживания",tAssess:"Оценка",tSites:"Объекты",tCharts:"Анализ",tTable:"Таблица",tSettings:"Настройки",tMap:"Карта",mapLegend:"Уровни PCLOS",cutsTitle:"Границы категорий (PCLOS%)",cutsNote:"Нижняя граница категорий A, B, C, D, E. F — остальное.",presetArticle:"Статья (80/60/40/20)",presetCustom:"Ваша карта (85/70/55/40/25)",mapTitle:"ГИС-карта",mapNote:"Цвет точки — категория PCLOS. Нажмите на точку: название, PCLOS% и категория.",noCoords:"Объекты без координат (не на карте). Добавьте GPS через «Изменить»:",noneOnMap:"Пока нет объектов с координатами. В новой оценке координаты берутся автоматически.",gisExport:"Экспорт в ГИС",gisNote:"GeoJSON: QGIS, ArcGIS, geojson.io. KML: Google Earth (с цветами). В ZIP — GeoJSON, KML, CSV и стиль QGIS (.qml): загрузите стиль в слой, и точки окрасятся по категориям A–F.",zipAll:"Всё (ZIP)",
+  name:"Местоположение",namePh:"напр.: ул. Навои – пр. Амира Темура",type:"Тип перекрёстка",region:"Регион",shape_x4:"Четырёхсторонний (X)",shape_t3:"Трёхсторонний (T или Y)",shape_multi:"Многосторонний (5+)",shape_round:"Кольцевой",control:"Тип регулирования",ctrl_sig:"Регулируемый (светофор)",ctrl_btn:"Светофор с кнопкой вызова",ctrl_uns:"Нерегулируемый",ctrl_reg:"Регулировщик",typeShort_x4:"X-образный",typeShort_t3:"T-образный",typeShort_multi:"Многосторонний",typeShort_round:"Кольцевой",typeShort_intersection:"Перекрёсток",typeShort_midblock:"Перегон",ctrlNeed:"Сначала выберите тип регулирования: регулируемый или нерегулируемый. От него зависит метод.",hcmTitle:"Условия движения (задержка, HCM)",hcmSigNote:"Регулируемый: средняя задержка пешехода d = (C − g)² / 2C. При дополнительных данных считается балл LOS по HCM 2010.",hcmUnsNote:"Нерегулируемый: пешеход ждёт достаточный интервал (критический интервал), учитывается уступание водителей (HCM 2010, гл. 19).",cycle:"Цикл C (с)",gwalk:"Зелёный для пешеходов g (с)",vturn:"Поворачивающие (авт/ч)",n15:"Поток главной улицы (авт/15 мин)",v85:"Скорость V85 (км/ч)",flow:"Поток пересекаемой дороги (авт/ч, оба направления)",yieldp:"Уступающие водители (%)",clen:"Длина перехода (м)",clenPh:"полосы × 3,5",delay:"Средняя задержка",losDelay:"LOS по задержке",losScore:"Балл HCM 2010",tcrit:"Критический интервал",pdelayed:"Доля задержанных",infra:"Инфраструктура (PCLOS)",oper:"Условия движения (HCM)",na:"Не требуется (не учитывается)",naAuto:"Некоторые индикаторы отмечены «не требуется» по типу регулирования и числу полос; при необходимости измените.",mapBy:"Цвет по",hcmLegend:"регулируемый / нерегулируемый",sec:"с",date:"Дата",gps:"Координаты",getGps:"Получить GPS",gpsFail:"Не удалось получить координаты. Включите геолокацию или введите вручную.",gpsWait:"Определяем местоположение…",gpsOk:"Координаты получены автоматически",acc:"точность",onMap:"На карте",
+  measure:"Параметры",speed:"Скорость (км/ч)",width:"Ширина перехода (м)",lanes:"Число полос",measureNote:"При вводе числа индикатор оценивается автоматически.",
+  choose:"Выберите…",std:"Норматив",calc:"Рассчитать",answered:"оценено",missing:"Неоценённые индикаторы считаются как 0.",
+  result:"Результат",sum:"Итого PCLOS (ΣCi·Pi)",ideal:"Идеал (ΣCi)",pct:"PCLOS%",desc:"Описание",need:"Необходимость улучшений",recs:"Рекомендации",recsNote:"По убыванию эффекта: рост PCLOS% при доведении индикатора до 1.",noRecs:"Все индикаторы соответствуют нормативу.",
+  save:"Сохранить",update:"Обновить",newA:"Новая оценка",saved:"Сохранено",updated:"Обновлено",
+  sitesTitle:"Оценённые объекты",empty:"Объектов пока нет. Добавьте первый в разделе «Оценка».",sample:"пример",loadSample:"Загрузить пример",clearAll:"Удалить все",confirmQ:"Вы уверены?",yes:"Да, удалить",no:"Отмена",del:"Удалить",edit:"Изменить",deleted:"Удалено",
+  importX:"Импорт из Excel",importJ:"Восстановить копию",exportJ:"Резервная копия (JSON)",imported:"Импортировано: ",importFail:"Не удалось прочитать файл",
+  chartsTitle:"Графики и взаимосвязи",needSites:"Для графиков нужен хотя бы 1 объект.",
+  c1:"PCLOS% по объектам",c1n:"Линии — границы категорий: 20, 40, 60, 80%.",
+  c2:"Вклад индикаторов",c2n:"Синий: набранные баллы (Ci·Pi). Светлый: потерянные Ci·(1−Pi).",gotten:"Набрано Ci·Pi",lost:"Потеряно",
+  c3:"Профиль по группам",c3n:"Доля набранных баллов от идеальных в каждой группе, %.",
+  c4:"Карта баллов индикаторов (Pi)",c5:"Важность индикаторов (Ci)",c5n:"Ci — средняя оценка по шкале Лайкерта (1–5).",
+  c6:"Анализ важность–исполнение (IPA)",c6n:"X: Ci (важность), Y: средний Pi по объектам. Линии — средние.",
+  q1:"Приоритет улучшения",q2:"Поддерживать",q3:"Низкий приоритет",q4:"Избыточные ресурсы",
+  c7:"Потенциал улучшения",c7n:"Средний прирост PCLOS% при доведении индикатора до 1: ΔPCLOS% = Ci·(1−Pi)/ΣCi·100.",
+  c8:"Корреляция индикаторов",c8n:"r Пирсона по объектам. «—»: индикатор одинаков на всех объектах. Для надёжных выводов нужно 10+ объектов.",
+  c9:"Индикатор и PCLOS%",c9n:"Корреляция (r) каждого Pi с PCLOS%.",
+  c10:"Связь двух переменных",c10n:"Выберите оси. Линия — линейная регрессия.",xAxis:"Ось X",yAxis:"Ось Y",
+  c11:"Распределение категорий",site:"Объект",all:"Все объекты",mean:"Среднее",
+  tableTitle:"Таблица результатов",exportX:"Скачать Excel",exportC:"Скачать CSV",copy:"Копировать",copied:"Таблица скопирована. Вставьте в Excel.",dlFail:"В этом окне загрузка заблокирована. Используйте «Копировать» или установленное приложение.",
+  grade:"Категория",total:"Итого",
+  settingsTitle:"Настройки",indicator:"Индикатор",ciTitle:"Коэффициенты индикаторов (Ci)",ciNote:"По умолчанию — из статьи (n=150). Введите средний балл своего опроса, чтобы заменить.",def:"По умолч.",own:"Свой",active:"Актив.",reset:"Сбросить",resetDone:"Ci сброшены",
+  method:"Методика",mUz:"Узбекистан (11)",ciNoteCrf:"Веса без опроса, на основе данных: доля снижения ДТП с пешеходами (CRF, FHWA CMF Clearinghouse, IIHS). Нормативные требования без известного CRF (доступность, содержание) получают минимальный вес Ci = 1.",critRule:"Критические требования: скорость ≤60 км/ч (P01), пешеходный светофор где требуется (P10), разметка перехода (P02). Если одно из них 0 баллов, уровень не выше D независимо от PCLOS%.",critNote:"Нарушено критическое требование, уровень ограничен D:",district:"Район / город",village:"Кишлак / посёлок / махалля",villagePh:"Выберите из списка или введите",regionFirst:"Сначала выберите регион",ciNoteUz:"Значения по умолчанию — из экспертного опроса магистерской диссертации. Введённые вами или применённые из опроса ниже значения заменяют их.",mAh:"Ahmed 2021 (17)",peds:"Поток пешеходов (пеш./ч)",reqW:"Требуемая ширина",walkT:"Время выхода (с)",vdes:"Расчётная скорость",vStd:"1,07 м/с (стандарт)",vOld:"0,84 м/с (пожилые, дети)",clenS:"Длина перехода (м)",gtTitle:"Зелёное время для пешеходов",gtOk:"достаточно",gtBad:"недостаточно",gtRec:"Увеличить зелёный для пешеходов минимум до {g} с (G = WALK + L/V)",waitAuto:"Время ожидания",sigWarrant:"По ГОСТ 23457-86 здесь нужен светофор (≥600 авт./ч и ≥150 пеш./ч).",svTitle:"Экспертный опрос (Ci)",svNote:"Каждый эксперт оценивает важность индикатора от 1 до 5. Среднее становится Ci. «Применить как Ci» записывает его в таблицу выше.",svAdd:"+ Эксперт",svDel:"− Удалить последнего",svApply:"Применить как Ci",svCsv:"Скачать опрос CSV",svMean:"Среднее",svN:"n",svExp:"Э",svApplied:"Ci обновлены",svEmpty:"Эксперты ещё не добавлены.",methodTextUz:"Методика Узбекистана включает 11 индикаторов (по магистерской диссертации). Каждый индикатор оценивается на месте по действующим нормам Узбекистана: 0, 0,5 или 1 балл (Pi). Ci — важность индикатора (среднее экспертных оценок 1–5). Нетребуемые индикаторы исключаются.",srcUz:"Источники: Постановление КМ № 140 от 03.04.2023; O‘z DSt 3644:2023 (пешеходные переходы); O‘z DSt 3283:2023 (дорожные знаки); O‘zMSt 349:2024 (светофоры); ГОСТ 23457-86 (правила применения ТСОДД); Руководство CAREC АБР (2022); HCM 2010; Ahmed et al. (2021).",methodText:"Каждый индикатор оценивается на месте по нормативу: 0, 0,5 или 1 балл (Pi). Ci — вес по влиянию на безопасность: Ci = 1 + 4·CRF/48 (CRF — снижение ДТП с пешеходами, %). Не требуемые индикаторы (N/A) исключаются из ΣCi. Условия движения по HCM 2010: регулируемый d=(C−g)²/2C, LOS ≤10/20/30/40/60 с; нерегулируемый — критический интервал tc=L/1,07+3 с с учётом уступания, LOS ≤5/10/20/30/45 с.",
+  gradeTable:"Таблица категорий",range:"Диапазон",source:"Источник",theme:"Тема",themeAuto:"Авто",themeLight:"Светлая",themeDark:"Тёмная",
+  about:"Данные хранятся только на этом устройстве.",groupsShort:["Геометрия","Контроль","Покрытие","Инклюзив."]}
+};
+
+/* ===================== HOLAT ===================== */
+const KEY="pclos-app-v1";
+var S; S = load();
+function blankDraft(){return {method:"ahmed",id:null,name:"",type:"x4",control:"",date:new Date().toISOString().slice(0,10),lat:"",lon:"",speed:"",width:"",lanes:"",scores:{}}}
+function load(){
+  let s=null; try{s=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+  if(!s){s={lang:"uz",theme:"auto",likert:{},sites:SAMPLE.map((x,i)=>mkSample(x,i)),draft:blankDraft(),tab:"assess",showResult:false}}
+  s.draft = s.draft || blankDraft(); s.likert = s.likert||{}; s.sites=s.sites||[];
+  s.method="ahmed"; if(!s.cutsBy){s.cutsBy={}; if(Array.isArray(s.cuts)) s.cutsBy.ahmed=s.cuts} 
+  s.sites.forEach(x=>{if(!x.method) x.method=methodOf(x)}); if(!s.draft.method) s.draft.method=s.method;
+  s.sites=s.sites.filter(x=>!(x.sample&&methodOf(x)==="uz"));
+  return s;
+}
+function mkSample(x,i){const sc={};IND_AH.forEach((d,j)=>sc[d.c]=x[2][j]);return {method:"ahmed",id:"s"+i+Date.now().toString(36),name:x[0],type:x[1],date:"2021-08-20",lat:"",lon:"",sample:true,scores:sc}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const t = k => (T[S.lang]&&T[S.lang][k]) ?? T.uz[k] ?? k;
+const L = o => o[S.lang] ?? o.uz;
+const ciOf = c => BYC[c].ci;
+const ideal = () => IND.reduce((a,d)=>a+ciOf(d.c),0);
+/* Hal qiluvchi talablar: biri buzilsa daraja D dan yuqori bo‘lmaydi */
+function critFails(site){const sc=site.scores||{}, f=[]; if(sc.P01===0) f.push("P01"); if(sc.P10===0) f.push("P10"); if(sc.P02===0) f.push("P02"); return f}
+function compute(site){
+  const m=methodOf(site), list=METHODS[m].ind;
+  let sum=0,n=0,id=0; list.forEach(d=>{const p=site.scores[d.c]; if(p===-1){n++;return} id+=ciOf(d.c); if(p!==undefined&&p!==null&&p!==""){n++; sum+=ciOf(d.c)*p}});
+  const pct= id>0? sum/id*100 : 0; let grade=gradeOf(pct,m); const crit=critFails(site); if(crit.length&&"ABC".includes(grade)) grade="D";
+  return {sum,ideal:id,pct,grade,answered:n,total:list.length,crit};
+}
+const fmt=(x,d=2)=> (x==null||!isFinite(x))?"—":Number(x).toLocaleString(S.lang==="en"?"en-US":S.lang==="ru"?"ru-RU":"uz-UZ",{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(m){const el=document.getElementById("toast");el.textContent=m;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,2600)}
+function applyTheme(){const r=document.documentElement; if(S.theme==="auto") r.removeAttribute("data-theme"); else r.setAttribute("data-theme",S.theme)}
+
+/* ===================== IKONKALAR ===================== */
+const IC={
+ assess:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3.5h6v2H9zM8.5 11l2 2 4-4M8.5 17h7"/></svg>',
+ map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5V4l-6 2.5L9 4z"/><path d="M9 4v13M15 6.5v13"/></svg>',
+ sites:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.5-6-10.5a6 6 0 1 1 12 0C18 15.5 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.2"/></svg>',
+ charts:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6M20 16v-9"/></svg>',
+ table:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 4v16"/></svg>',
+ settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>',
+ walker:'<svg viewBox="0 0 48 48" fill="currentColor"><circle cx="27" cy="7" r="4.5"/><path d="M24.5 13.5c-2.2 0-3.6 1-4.6 2.6l-4.4 7.6c-.6 1.1-.2 2.4.9 3 1.1.6 2.4.2 3-.9l2.4-4.3 1.1 6.6-4.8 15.3c-.4 1.3.3 2.6 1.6 3 1.3.4 2.6-.3 3-1.6l4.2-13.2 3.8 6.2.6 7.6c.1 1.3 1.3 2.3 2.6 2.2 1.3-.1 2.3-1.3 2.2-2.6l-.7-8.3c0-.4-.2-.8-.4-1.1l-4.1-6.8-1.1-7.2 1.5 2.3c.3.5.9.9 1.5 1l5.6.9c1.3.2 2.5-.7 2.7-2 .2-1.3-.7-2.5-2-2.7l-4.6-.7-3.6-5.6c-1-1.5-2.7-2.4-4.5-2.4z"/></svg>'};
+
+/* ===================== RENDER ===================== */
+const TABS=["assess","sites","map","charts","table","settings"];
+const TABKEY={map:"tMap",assess:"tAssess",sites:"tSites",charts:"tCharts",table:"tTable",settings:"tSettings"};
+let charts=[];
+function killCharts(){charts.forEach(c=>{try{c.destroy()}catch(e){}});charts=[]; if(lmap){try{lmap.remove()}catch(e){} lmap=null}}
+let lmap=null;
+function renderTabs(){
+  document.getElementById("tabs").innerHTML=TABS.map(k=>`<button id="tab-${k}" data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${IC[k]}<span>${t(TABKEY[k])}</span></button>`).join("");
+}
+function header(title,sub){
+  return `<div class="topbar"><div><h1>${esc(title)}</h1>${sub?`<p class="sub">${esc(sub)}</p>`:""}</div>
+  <div class="lang" role="group" aria-label="Language">${["uz","en","ru"].map(l=>`<button data-lang="${l}" aria-pressed="${S.lang===l}">${l.toUpperCase()}</button>`).join("")}</div></div>`;
+}
+function render(){
+  killCharts(); renderTabs(); document.documentElement.lang=S.lang;
+  const app=document.getElementById("app");
+  ({assess:renderAssess,sites:renderSites,map:renderMap,charts:renderCharts,table:renderTable,settings:renderSettings}[S.tab]||renderAssess)(app);
+  if(S.tab==="assess"&&!S.draft.id) locate(true);
+}
+
+/* ---------- Baholash ---------- */
+function methodSeg(){return "";`<div class="field" style="margin-bottom:16px"><span class="small muted">${t("method")}</span><div class="seg" role="group"><button data-method="uz" aria-pressed="${S.method==="uz"}">${t("mUz")}</button><button data-method="ahmed" aria-pressed="${S.method==="ahmed"}">${t("mAh")}</button></div></div>`}
+function piClass(v){return v===1?"s1":v===0.5?"s05":v===0?"s0":""}
+function renderAssess(app){
+  const d=S.draft, r=compute(d);
+  let h=header(t("title"),t("subtitle"))+methodSeg();
+  h+=`<div class="stack">
+   <div class="field"><label for="f-name">${t("name")}</label><input type="text" id="f-name" value="${esc(d.name)}" placeholder="${esc(t("namePh"))}"></div>
+   <div class="field"><label for="f-region">${t("region")}</label><select id="f-region"><option value="">${t("choose")}</option>${REGIONS.map(r=>`<option ${d.region===r?"selected":""}>${r}</option>`).join("")}</select></div>
+   <div id="adm-box">${admHTML(d)}</div>
+   <div class="grid2">
+    <div class="field"><label for="f-ctrl">${t("control")}</label><select id="f-ctrl"><option value="">${t("choose")}</option>${["sig","btn","uns","reg"].map(k=>`<option value="${k}" ${d.control===k?"selected":""}>${t("ctrl_"+k)}</option>`).join("")}</select></div>
+    <div class="field"><label for="f-type">${t("type")}</label><select id="f-type">${["x4","t3","multi","round"].concat(["x4","t3","multi","round"].includes(d.type)?[]:[d.type]).map(k=>`<option value="${k}" ${d.type===k?"selected":""}>${(T[S.lang]["shape_"+k]||t("typeShort_"+k))}</option>`).join("")}</select></div>
+   </div>
+   ${d.control?"":`<p class="note" style="margin:0">${t("ctrlNeed")}</p>`}
+   <div class="field"><label for="f-date">${t("date")}</label><input type="date" id="f-date" value="${esc(d.date)}"></div>
+   <div class="field"><div class="lblrow"><span class="lbl">${t("gps")}</span><button class="info" id="btn-gps" type="button">${t("getGps")}</button></div>
+    <div class="grid2"><input type="text" inputmode="decimal" id="f-lat" placeholder="41.3111" value="${esc(d.lat)}" aria-label="lat"><input type="text" inputmode="decimal" id="f-lon" placeholder="69.2797" value="${esc(d.lon)}" aria-label="lon"></div><div class="small muted" id="gps-status">${gpsStatusHTML()}</div></div>
+  </div>
+  <div class="group"><div class="ghead"><h2>${t("measure")}</h2></div>
+   <div class="grid3">
+    <div class="field"><label for="f-speed" class="small">${t("speed")}</label><input type="number" inputmode="decimal" id="f-speed" value="${esc(d.speed)}" placeholder="60"></div>
+    <div class="field"><label for="f-width" class="small">${t("width")}</label><input type="number" inputmode="decimal" step="0.1" id="f-width" value="${esc(d.width)}" placeholder="3,0"></div>
+    <div class="field"><label for="f-lanes" class="small">${t("lanes")}</label><input type="number" inputmode="numeric" id="f-lanes" value="${esc(d.lanes)}" placeholder="4"></div>
+   </div>
+   <div class="grid2"><div class="field"><label for="f-peds" class="small">${t("peds")}</label><input type="number" inputmode="numeric" id="f-peds" value="${esc(d.peds??"")}" placeholder="600"></div><div class="small muted" id="reqw" style="align-self:end;padding-bottom:12px">${reqWHTML(d)}</div></div>
+   <p class="note" style="margin:0">${t("measureNote")}</p></div>
+  <div class="group" id="hcm-group">${hcmFormHTML(d)}</div>`;
+  GROUPS.forEach(g=>{
+    h+=`<div class="group"><div class="ghead"><h2>${esc(L(g))}</h2><span class="code">${g.codes[0]}–${g.codes[g.codes.length-1]}</span></div>`;
+    g.codes.forEach(c=>{const ind=BYC[c], v=d.scores[c];
+      h+=`<div class="field" id="row-${c}"><div class="lblrow"><label for="sel-${c}">${esc(L(ind.n))} <span class="code">${c}</span></label>
+        <span class="pi ${piClass(v)}" id="pi-${c}">Pi ${v===undefined?"–":v===-1?"N/A":fmt(v,v===0.5?1:0)} · Ci ${fmt(ciOf(c))}</span></div>
+        <select id="sel-${c}" data-code="${c}"><option value="">${t("choose")}</option>${ind.o.map(o=>`<option value="${o.v}" ${v===o.v?"selected":""}>${esc(L(o))}  ·  ${o.v}</option>`).join("")}<option value="-1" ${v===-1?"selected":""}>${t("na")}</option></select>
+        <button class="info" type="button" data-std="${c}" style="align-self:flex-start">${t("std")} ▾</button>
+        <div class="std" id="std-${c}" hidden>${esc(L(ind.s))}</div></div>`;});
+    h+=`</div>`;
+  });
+  h+=`<div class="group">
+    <div class="lblrow small"><span id="prog-txt">${r.answered}/${IND.length} ${t("answered")}</span><span class="muted" id="prog-miss" ${r.answered===IND.length?"hidden":""}>${t("missing")}</span></div>
+    <div class="progress"><i id="prog-bar" style="width:${r.answered/IND.length*100}%"></i></div>
+    <button class="btn primary" id="btn-calc" type="button">${t("calc")}</button>
+    <div id="result-area">${S.showResult?resultHTML(d):""}</div></div>`;
+  app.innerHTML=h;
+}
+function recList(site){
+  const id=compute(site).ideal;
+  return IND.filter(d=>site.scores[d.c]!==1&&site.scores[d.c]!==-1).map(d=>{const p=site.scores[d.c]??0; return {d,p,gain:ciOf(d.c)*(1-p)/id*100}}).sort((a,b)=>b.gain-a.gain);
+}
+function resultHTML(d){
+  const r=compute(d), G=GRADES[r.grade], recs=recList(d);
+  return `<div class="stack" style="margin-top:6px">
+   <div class="result" id="result-card"><span class="walker">${IC.walker}</span><span class="big">PCLOS: ${r.grade}</span><span class="pill">${fmt(r.pct,0)} %</span></div>
+   ${(()=>{const h=hcm(d); return h&&h.ok?`<div class="result" style="border-color:var(--line)"><span class="badge b${h.losScore||h.los}" style="width:44px;height:44px;font-size:22px">${h.losScore||h.los}</span><span style="flex:1"><b>${t("oper")}</b><br><span class="small muted">${t("delay")}: ${fmt(h.delay,1)} ${t("sec")} · ${esc(t("ctrl_"+d.control))}</span></span></div>`:""})()}
+   ${(()=>{const c=greenCheck(d); return c&&!c.ok?`<p class="note" style="margin:0;border-color:#c62828">${t("gtTitle")}: ${t("gtBad")}. ${esc(t("gtRec").replace("{g}",fmt(Math.ceil(c.G),0)))}</p>`:""})()}
+   ${r.crit&&r.crit.length?`<p class="note" style="margin:0;border-color:#c62828">${t("critNote")} ${r.crit.map(c=>esc(L(BYC[c].n))+" ("+c+")").join(", ")}</p>`:""}
+   ${Object.keys(d.autoNA||{}).length?`<p class="note" style="margin:0">${t("naAuto")}</p>`:""}
+   <dl class="kv"><dt>${t("sum")}</dt><dd>${fmt(r.sum,3)}</dd><dt>${t("ideal")}</dt><dd>${fmt(r.ideal,2)}</dd><dt>${t("pct")}</dt><dd>${fmt(r.pct,2)} %</dd><dt>${t("desc")}</dt><dd style="font-weight:500">${esc(L(G)[0])}</dd><dt>${t("need")}</dt><dd style="font-weight:500">${esc(L(G)[1])}</dd></dl>
+   <div><h3>${t("recs")}</h3>${recs.length?`<p class="small muted" style="margin:2px 0 0">${t("recsNote")}</p><ul class="recs">${recs.map(x=>`<li><b>${esc(L(x.d.r))}</b> <span class="small muted">(${x.d.c}, Pi=${x.p}, +${fmt(x.gain,1)}%)</span></li>`).join("")}</ul>`:`<p class="muted">${t("noRecs")}</p>`}</div>
+   <div class="row"><button class="btn" id="btn-save" type="button" style="border-color:var(--primary);color:var(--primary)">${d.id?t("update"):t("save")}</button><button class="btn ghost" id="btn-new" type="button">${t("newA")}</button></div></div>`;
+}
+function updateLive(){
+  const d=S.draft, r=compute(d);
+  IND.forEach(ind=>{const el=document.getElementById("pi-"+ind.c); if(!el)return; const v=d.scores[ind.c]; el.className="pi "+piClass(v); el.textContent=`Pi ${v===undefined?"–":v===-1?"N/A":fmt(v,v===0.5?1:0)} · Ci ${fmt(ciOf(ind.c))}`; const s=document.getElementById("sel-"+ind.c); if(s) s.value= v===undefined?"":String(v);});
+  const pt=document.getElementById("prog-txt"); if(pt){pt.textContent=`${r.answered}/${IND.length} ${t("answered")}`; document.getElementById("prog-bar").style.width=(r.answered/IND.length*100)+"%"; document.getElementById("prog-miss").hidden=r.answered===IND.length;}
+  if(S.showResult){const ra=document.getElementById("result-area"); if(ra) ra.innerHTML=resultHTML(d);}
+  save();
+}
+function autoScoreAll(){["speed","width","lanes"].forEach(k=>autoScore(k,S.draft[k])); autoWait(); autoNA()}
+function autoScore(kind,val){
+  const x=parseFloat(String(val).replace(",",".")); if(!isFinite(x)) return;
+  if(S.method==="uz"){ if(kind==="speed") S.draft.scores.U01=x<=60?1:0; if(kind==="width"){const W=Math.max(4,(numv(S.draft.peds)||0)/500); S.draft.scores.U02=x>=W-1e-9?1:(x>=3?0.5:0)} if(kind==="lanes") S.draft.scores.U03=x<=4?1:(x<=6?0.5:0); return }
+  if(kind==="speed") S.draft.scores.P01 = x<=60?1:0;
+  if(kind==="width"){const W=Math.max(4,(numv(S.draft.peds)||0)/500); S.draft.scores.P03 = x>=W-1e-9?1:(x>=W-1-1e-9?0.5:0)}
+  if(kind==="lanes") S.draft.scores.P04 = x<=4?1:(x<=6?0.5:0);
+}
+
+
+const ADM={"Qoraqalpog‘iston Respublikasi":[["Amudaryo tumani","Amir Temur|Bobur nomli|Buzyop|Chaykul|Durman|Jumurtov|Kangli|Kilichboy|Kipshak|Mang‘it|Nazarxon|Oq oltin|O‘rta-qala|Qipchaq|Qlichboy|Quyuq-kupir|Tashyop|To‘lqin|Xitay|Xitoy|Xolimbeg"],["Beruniy tumani","Abay|Altinsay|Beruniy|Biybazar|Bulish|Do‘stlik|Maxtumquli|Navoiy|Ozod|Qizilqal’a|Sarkop|Shabaz|Shimam|Tinchlik"],["Bo‘zatov tumani",""],["Chimboy tumani","Ayteke|Baxitli|Chimboy|Kamisarik|Kenes|Kizil uzek|Kosterek|Kuksu|Mayjap|Pashen tov|Tagjap|Tazajol|Tazgara"],["Ellikqal’a tumani","Amirabad|Aqchakul|Bo‘ston|Do‘stlik|Ellikkala|Guldursun|Gulistan|Navoiy nomli|Qilchinok|Qirqqiz|Qizil qum|Sarabiy|Saxtiyon|Sharq Yulduzi|Taza bog‘"],["Kegeyli tumani","Aktuba|Aspantay|Jalpak jap|Janabazar|Juzim bag‘|Kazanketken|Kegeyli|Kumshunkul|Kusxanatau|Obad|Xalqobod|Yerkindarya"],["Mo‘ynoq tumani","Bozatau|Kazax-darya|Madeli|Mo‘ynoq|Tik-uzyak|Uchsay|Xakim-ata"],["Nukus tumani","Arbashi|Bakanshakli|Kerder|Krantau|Oqmang‘it|Samanbay|Takirkul"],["Qanliko‘l tumani","Arzimbet qum|Beskupir|Bustan|Jana qal’a|Kosjap|Navriz|Qanliko‘l"],["Qorao‘zak tumani","Berdax|Madeniyat|Olgabas|Qarabug‘a|Qarakul|Qorao‘zak|Qorauzek|Qoyboq|Yesimuzak"],["Qo‘ng‘irot tumani","Adebiyat|Ajaniyaz-ata nomli|Jasliq|Kanli|Kokdarya|Miynetabad|Oltinko‘l|Qaraqalpaqstan|Qipshaq|Qiriqqiz|Qo‘ng‘irot|Raushan|Suuyenli|Urnek|Ustyurt|Xorezm|Yelabad"],["Shumanay tumani","Ak jap|Begjap|Birleshik|Diyxanabad|Ketenler|Mamiy|Sarmanbaykol|Shumanay"],["Taxiatosh tumani","Kenеgеs|Naymanko‘l|Sarаyko‘l|Taxiatosh"],["Taxtako‘pir tumani","Atakul|Beltau|Janadarya|Mulik|Qara-oy|Qarateren|Qungrat kul|Taxtako‘pir"],["To‘rtko‘l tumani","A.Durdiyeva|Aqboshli|Aqqamish|Ata uba|Kana Turtkul|Kelteminar|Kukcha|Miskin|Nurli yo‘l|O‘zbekiston|Paxtaabad|Paxtachi|Qumbaskan|Shuraxan|Tazabogyap|Tozabog‘|To‘rtko‘l|Turkmankuli|Ullubog‘|Yonboshqal’a|Амиробод"],["Xo‘jayli tumani","Amudarya|Janajap|Kulyab|Mustaqillik|Qumjiqqin|Samankol|Sarishunkul|Vodnik|Xo‘jayli"],["Nukus","Karatau|Nukus shahar hokimiyatiga qarashli shaharchalar"]],"Andijon":[["Andijon tumani","Ayrilish|Bo‘taqora|Butaqora|Chilon|Chumbog‘ich|Ekin tikin|Guliston|Gulobod|Gumbaz|Kunji|Kuyganyor|Namuna|Nayman|Og‘ullik|Oq-Yor|Oq-yor|Orol|Qoraqalpoq|Qo‘nji|Qo‘shariq|Rovvot|Xakan|Xartum|Xrabek|Yangiobod|Yorboshi|Zavroq"],["Asaka tumani","Asaka|Ilg‘or|Kujgan|Mustahkam|Navkan|Niyozbotir|Oqbo‘yra|O‘zbekiston|Qadim|Qoratepa|T.Aliyev|Zarbdor"],["Baliqchi tumani","Baliqchi|Bo‘ston|Chinobod markaz|Eskixaqqulobod|Guliston|Olimbek|Oxunboboyev nomli|O‘rmonbek|Siza|Xo‘jaobod"],["Bo‘z tumani","Bo‘z|M.Jalolov nomli|Xoldevonbek|Xovos"],["Buloqboshi tumani","Andijon|Buloqboshi|Kulla|Mayariq|Nayman|Shirmonbuloq|Uchtepa"],["Izboskan tumani","Erkin|Gurkirov|Izboskan|Maygir|Namuna|O‘rtoqlar|Paytug|Shermatobod|To‘rtko‘l|Uzun ko‘cha|Yakkatut|Yangi qishloq|Yangizamon"],["Jalaquduq tumani","Abdullabiy|Beshtal|Beshtol|Guliston|Jalaquduq|Jalolquduq|Janubiy olamushuk|Ko‘kalam|Oyim|Qatortol|Qo‘shtepa|Teshiktosh|Yorqishloq"],["Marxamat tumani","Boboxuroson|Ko‘tarma|Marxamat|O‘qchi|Polvontosh|Qorabog‘ish|Qoraqo‘rg‘on|Rovot|Shukurmergan|Xakka|Xo‘jaariq"],["Oltinko‘l tumani","Bo‘ston|Dalvarzin|Ijtimoiyat|Jalabek|Kumakay|Madaniy mehnat|Markaz|Maslahat|Namuna|Oltinko‘l|Oraziy|Oxunboboyev nomli|Qo‘shtepa|Qo‘shtepasaroy|Suvyulduz|Xondibog‘i"],["Paxtaobod tumani","Bo‘ston|Do‘stlik|Ittifoq|Izboskan|Madaniyat|Paxtakor|Paxtaobod|Pushmon|Uyg‘ur"],["Qo‘rg‘ontepa tumani","Chimyon|Dardok|Qorasuv|Qo‘rg‘ontepa|Savay|Sultonobod"],["Shahrixon tumani","Abdubiy|Cho‘ja|Guliston|Naynavo|Nazarmaxram|O‘rta Shahrixon|O‘zbekiston|Paxtaobod|Segaza kum|Shahrixon|Toshtepa|Vaxim|Xaqiqat|Yangi yo‘l|Yuqori Shahrixon"],["Ulug‘nor tumani","Mingbuloq|Mingchinor|Navoiy nomli|Oq oltin"],["Xo‘jaobod tumani","Birlashgan|Dilkushod|Guliston|Ko‘tarma|Manak|Oltin vodiy|Xidirsha|Xo‘jaobod"],["Andijon",""],["Xonobod","Xonobod"]],"Surxondaryo":[["Angor tumani","Angor   ( мавжуд)|Angor  ( янги)|Do‘stlik|Gilambob|Istiqlol|Kayran|Navoiy|Novshaxar|Qorasuv|Tallimaron|Talloshqon|Xomkon|Yangi turmush|Yangiobod|Zang|Zartepa"],["Bandixon tumani",""],["Boysun tumani","Boysun|Chinorli|Ketmonchi|Kofrun|Machay|Pasurxi|Poyonqo‘rg‘on|Qorabo‘yin|Qo‘ng‘irot|Qo‘rg‘oncha|Rabot|Tangimush|Temir darvoza"],["Denov tumani","Anbarsoy|Binokor|Dahana|Denov|Do‘stlik|Farg‘ona|Hazarbog‘|Jamatak|Kenagas|Namozgoh|Paxtakurash|Pistamozor|Qiziljar|Sina|Tortuvli|Xayrabot|Xitoyan|Xolchayon|Yangi Hazorbog‘|Yangibog‘|Yangiobod|Yangizamon|Yurchi"],["Jarqo‘rg‘on tumani","Chorjo‘y|Dexqonobod|Jarqo‘rg‘on|Kafrun|Kakaydi|Markaziy Surxon|Minor|Oqqo‘rg‘on|Qoraqursoq|Sharq Yulduzi|Surxon"],["Muzrabot tumani","Baxt|Baynalmilal|Beshqo‘ton|Boldir|Chegarachi|Guliston|Iftixor|Muzrabot|Navbahor|Obodon|Oq oltin|Ozod Vatan|Qorakamar|Qozoyoqli|Sarhad|Sharq yulduzi|Sho‘rob|Taskent|Xalqobod"],["Oltinsoy tumani","Botosh|Bo‘ston|Chep|Dug‘oba|Ekraz|Gulobod|Ipoq|Jobu|Lutfiy|Mormin|Oltinsoy|Oq oltin|Oqarbuloq|Qorliq|Qurama|Shakarqamish|Uzumzor|Vaxshivor|Xayrandara|Xo‘jasoat|Yangiqurilish|Миршоди"],["Qiziriq tumani","Bandixon|Chorvador|Istara|Karmaki|Kirshak|Kunchiqish|Mehnatobod|Olmazor|Paxtakor|Qiziriq|Sariq|Sharq Istara|Yangi yo‘l|Yangihayot|Zarkamar"],["Qumqo‘rg‘on tumani","Arslonboyli|Azlarsoy|Bog‘ora|Elbayon|Elobod|Hurriyat|Jaloir|Jaloir Qo‘rg‘oni|Jiydali|Ketmon|Navbahor|Oqjar|Oqqapchig‘ay|Oqsoy|Qarsoqli|Qumqo‘rg‘on|Sheroziy|Yangiyer|Yuqori Kakaydi"],["Sariosiyo tumani","Bog‘i iram|Bo‘yropo‘sht|Buyuk kelajak|Dashnobod|Navro‘z|O‘zbekiston|Sangardak|Sariosiyo|Sharg‘un|So‘fiyon|Toqchiyon|Tortuli|Xufar|Yangihayot"],["Sherobod tumani","Bo‘ston|Chinobod|Cho‘yinchi|Kilkon|Ko‘hitang|Navbog‘|Oqqo‘rg‘on|Paxtaobod|Rabatak|Sariqamish|Seplon|Sherobod|Talloshqon|Yangiariq|Yangiturmush|Zarabog‘"],["Sho‘rchi tumani","Alpomish|Baxtlitepa|Dalvarzin|Elbayon|Elobod|G‘armaqo‘rg‘on|Jaloir|Jarqishloq|Joyilma|Karvon|Kattasovur|Qo‘ldosh|Qo‘shtegirmon|Savur|Sho‘rchi|Sohibkor|To‘la|Xushchekka|Yalti|Yangibozor"],["Termiz tumani","At-Termiziy|Chegarachi|Kokildorota|Limonchi|Mehnatobod|Mustaqillik|Namuna|Pattakesar|Paxtaobod|Qizilboy|Tajribakor|Uchqizil|Yangiariq"],["Uzun tumani","Bobotog‘|Chinor|Fayzova|Jonchekka|Malandiyon|Mehnat|Oq Ostona|Qarashiq|Telpakchinor|Ulanqul|Uzun|Xonjiza|Yangi kuch|Yangi ro‘zg‘or"],["Termiz",""]],"Jizzax":[["Arnasoy tumani","Bo‘ston|Cho‘lquvar|Do‘stlik|Gulbahor|G‘oliblar|Oltin vodiy|Yangibo‘ston|Zarafshon"],["Baxmal tumani","Alamli|Barlos|Baxmal|Bog‘ishamol|Gulbuloq|Mo‘g‘ol|Novqa|Oqtosh|Oyqor|O‘smat|Sangzor|Tongotar|Uzunbuloq"],["Do‘stlik tumani","Bog‘zor|Bunyodkor|Do‘stlik|Manas|Mevazor|Navro‘z|Oltin vodiy|Qahramon|Saritepa"],["Forish tumani","Arnasoy|Bog‘don|Darvoza|Egizbuloq|Forish|Garasha|Omonkeldi|Osmonsoy|Qizilqum|Qoraabdol|Uchquloch|Uxum"],["G‘allaorol tumani","Abdukarim|Buloqboshi|Chuvilloq|Gulchambar|Guliston|G‘allaorol|G‘ubdin|Ittifoq|Korizquduq|Ko‘kbuloq|Lalmikor|Madaniyat|Marjonbuloq|Mirzabuloq|Moltob|Mulkush|Qangliobod|Qipchoqsuv|Qo‘ytosh|Tozaurug‘|Xonimqo‘rg‘on"],["Mirzacho‘l tumani","Bog‘bon|Gagarin|Gulzor|Jibek-jo‘li|Mirzadala|O‘zbekiston|Paxtazor|Toshkent|Yangidala"],["Paxtakor tumani","Bog‘ishamol|Buyuk Ipak yo‘li|Chamanzor|Gulzor|Mingchinor|Olmazor|Oq buloq|Paxtakor"],["Sh.Rashidov tumani","Fayzobod|Gandumtosh|Jizzaxlik|Kuyovboshi|Mulkanlik|Oq oltin|Paxtaobod|Qang‘li|Qorayantoq|Qo‘shbarmoq|Qulama|Rovat|Samarqand quduq|Toqchiliq|Uch-tepa|Uchtepa|Xayrobod|Ziyokor"],["Yangiobod tumani","Havotog‘|Sarmich|Savot|Xovos|Xo‘jamushkent|Yangiobod"],["Zafarobod tumani","Birlik|Chimqo‘rg‘on|Lolazor|Nurafshon|Pistalikent|Uzun|Xulkar|Yorqin|Zafarobod"],["Zarbdor tumani","Adirobod|Andijon|Bo‘ston|Fayzobod|Lalmikor|Oqar|Sharq yulduzi|Tinchlik|Toshkesgan|Yangikent|Zarbdor"],["Zomin tumani","A.Navoiy|Beshkubi|Chorvador|Dashtobod|Duoba|Gulshan|G‘allakor|Istiqlol|Obi hayot|Pshag‘or|Shirin|Sirg‘ali|Yom|Zomin"],["Jizzax",""]],"Toshkent viloyati":[["Bekobod tumani","Bahoriston|Bekobod|Bobur|Chanoq|Dalvarzin|Guliston|Gulzor|Jumabozor|Ko‘rkam|Madaniyat|Mehnatobod|Mo‘yinqum|Qiyot|Xos|Yangihayot|Yangiqo‘rg‘on|Zafar"],["Bo‘ka tumani","Bo‘ka|Chig‘atoy|Iftixor|Ko‘korol|Namuna|Qoraqo‘yli|Qo‘shtepa|Rovot|Turon"],["Bo‘stonliq tumani","Azadbash|Bog‘iston|Bo‘stonliq|Burchmullo|Chimboyliq|Chimgan|Chinor|Chorvoq|Dumaloq|G‘azalkent|Ho‘ja|Iskandar|Nanay|Pargos|Pskom|Qoramanas|Qoronqul|Qo‘shqo‘rg‘on|Qurbonov nomli|Sari qanli|Sijjak|Sobir Raximov|Soyliq|Talpin|Tulabe|Uyenqulsoy|Xondoyliq|Xo‘jakent|Xumsan|Yangi ovul"],["Chinoz tumani","A.Temur|Birlik|Chinoz|Chorvador|Do‘stlik|Eshonobod|Eski Toshkent|Gulzorobod|Isloxat|Kir|Ko‘tarma|Olmazor|O‘zbekiston|Paxta|Turkiston|Yangi Chinoz|Yollama"],["Ohangaron tumani","Birlik|Do‘stlik|Eyvalek|Ozodlik|Qora Xitoy|Qora xitoy|Qurama|Susam|Telov|Uvaq|Yon-ariq"],["Oqqo‘rg‘on tumani","Achchi|Do‘stlik|Eltamg‘ali|Erkinlik|Hamzaobod|Olimkent|Oqqo‘rg‘on|Oytamg‘ali|Shoxruxiya|Toshto‘g‘on|Zafar|Zarbdor"],["O‘rtachirchiq tumani","Angor|Haqiqat|Istiqbol|Kuchluk|Navoiy nomli|Oq ota|O‘rtasaroy|Paxtakor|Paxtaobod|Qorasuv|Qumovul|Sholikor|Tuyabo‘g‘iz|Uyshun|Yangi turmush|Yo‘ng‘ichqala"],["Parkent tumani","Boshqizilsoy|Bo‘ston|Changi|Chinorli|Nomdanak|Parkent|Qoraqalpoq|Qo‘rg‘ontepa|Quyosh|So‘qoq|Xisarak|Zarkent"],["Piskent tumani","Dungqo‘rg‘on|Kelovchi|Koriz|Muratali|Murotali|Oq tepa|Pskent|Said"],["Qibray tumani","Alisherobod|Argin|Baytqo‘rg‘on|Chinobod|Do‘rmon|Geofizika|Ko‘prik boshi|Madaniyat|Mustaqillik|Nurafshon|Oq-qovoq|O‘tkir|Qibray|Qipchoq|Salar|Taraqqiyot|Tuzel|Unqo‘rg‘on|Unqo‘rg‘on-1|Uymaut|X.Amirov|Yangiobod|Yon-ariq|Yoshlik|Zafarobod"],["Quyichirchiq tumani","Do‘stobod|Gul|Ketmontepa|Maydontol|Ma’naviyat|Ma’rifat|O‘zbekiston|Paxtazor|Qo‘rg‘oncha|Toshloq|Toshovul"],["Toshkent tumani","Chig‘atoy|Choshtepa|Chuvalachi|Guliston|Hasanboy|Keles|Kensoy|Ko‘k Saroy|Ko‘k saroy|Ko‘k-terak|M.Fozilov|Masalboy|Qashqarlik|Qizg‘aldoq|Sabzavot|Shamsiobod|Yunusobod|Z.Jalilov"],["Yangiyo‘l tumani","Bozsu|Eski Qovunchi|Gulbahor|Halqobod|Kirsadoq|Navbahor|Niyozbosh|Nov|Qovunchi|Qo‘sh yog‘och|Sho‘ralisoy|Xonqo‘rg‘on|Yo‘g‘ontepa"],["Yuqorichirchiq tumani","Arganchi|Bordonko‘l|Istiqlol|Jambul|Mirobod|Navro‘z|Oqovul|Sakson ota|Surnkent|Tinchlik|Xitoy Tepa|Yangibozor"],["Zangiota tumani","Axmad Yassaviy|Boz-su|Chig‘atoy-Oqtepa|Daliguzar|Erkin|Eshonguzar|Honobod|Nazarbek|O‘rtaovul|O‘zgarish|Pastdarxon|Qatortol|Quyoshli|Tarnov|Turkiston|Ulug‘bek|Xonabod|Zangiota"],["Angren","Angren shahar xokimligiga qarashli shaharchalar|Krasnogorsk|Nurobod|Yangiobod"],["Bekobod",""],["Chirchiq",""],["Nurafshon",""],["Ohangaron",""],["Olmaliq",""],["Yangiyo‘l",""]],"Toshkent shahri":[["Bektemir tumani",""],["Chilonzor tumani",""],["Mirobod tumani",""],["Mirzo Ulug‘bek tumani","Mirzo Ulug‘bek tumani xokimiyatiga qarashli shaharlar|Ulug‘bek"],["Olmazor tumani",""],["Shayxontohur tumani",""],["Sirg‘ali tumani",""],["Uchtepa tumani",""],["Yakkasaroy tumani",""],["Yangihayot tumani",""],["Yashnobod tumani",""],["Yunusobod tumani",""],["Toshkent shahrining tumanlari",""]],"Farg‘ona":[["Beshariq tumani","Andarxon|Beshariq|Beshsari|Chimboy|Kapayangi|Manguobod|Nafosat|Oqtovuq|Qashqar|Qorajiyda|Qumqishloq|Rapqon|Tovul|Uzun|Vatan|Yakkatut|Zarqaynar"],["Bog‘dod tumani","Amirobod|Bog‘dod|Bog‘ishamol|Bordon|Chermirzaobod|Churindi|Chuvalanchi|Do‘rmancha|Do‘rmoncha|Irgali|Kaxat|Konizar|Matqulobod|Maylavoy|Mirzaobod|Oltin vodiy|O‘ltarma|Paxtaobod|Qaroqchitol|Qirqboldi|Qo‘shtegirmon|Samandarak|Samarqand|Tinchlik|Xusnobod|Zafarobod"],["Buvayda tumani","Alqor|Begobod|Beshterak|Buvayda|Chinobod|Ibrat|Jalayer|Oqqo‘rg‘on|Qo‘ng‘irot|Qo‘rg‘onobod|Qum|Quyi Bachqir|Quyi Urganji|Uzumzor|Yangiqadam|Yangiqo‘rg‘on|Yuqori Bachqir|Yuqori Nayman|Zarbuloq"],["Dang‘ara tumani","Chinobod|Dang‘ara|Doimobod|Katta Ganjiravon|Katta Turk|Mulkobod|Naymancha|Oqdjar|Qiyali|Qum Qiyali|Sanam|Sohil|Taypoq|Toptiqsaroy|Tumor|Yangi zamon|Yuqori Urganji"],["Farg‘ona tumani","Archa|Avval|Bahor|Chimyon|Chimyon  ( мавжуд)|Damko‘l|Gulshan|Langar|Log‘on|Mindon|Navkat|Neftchilar|Novkent|Oqbilol|Parvoz|Qaptarxona|Qo‘rg‘ontepa|Shoximardon|Shoximardonobod|Soy bo‘yi|Vodil|Xonqiz|Xo‘roba|Yoshlarobod|Yuqori Mindon|Yuqori Oqtepa|Yuqori Soybo‘yi|Yuqori Vodil"],["Furqat tumani","Chek chuvaldak|Eshon|Eski|G‘allakor|G‘uncha|Kaldo‘shan|Navbahor|Qo‘qon|Qo‘qonboy|Shoyinbek|Shunkor|Tomosha"],["Oltiariq tumani","Azimobod|Bo‘rbaliq|Chinor|Chordara|Djurek|Eskiarab|Fayziobod|G‘ayrat|Kapchugay|Katput|Oltiariq|Oqbo‘yra|Poloson|Povulg‘on|Qiziltepa|Tinchlik|Toshqo‘rg‘on|Yangiarab|Yangiqo‘rg‘on|Zilxa"],["O‘zbekiston tumani","Avg‘on|Dahana Qaqir|G‘aniobod|Iftixor|Islom|Katta Tagob|Kichik Tagob|Konizar|Kudash|Kul elash|Mingtut|Nursux|Oqmachit|Ovchi|Oxta Tagob|Oyimcha Qaqir|O‘qchi Dasht|O‘qchi Rajabgardi|Qaynar|Qizil Qaqir|Qorayozbobo|Qo‘rg‘oncha|Qo‘shqo‘noq|Qulibek|Qumbosti|Rajabgardi|Sardoba|Sho‘rsuv|Tagob|Yaypan"],["Qo‘shtepa tumani","Boltako‘l|Do‘rmon|Eshonguzar|Fayz|Gishtmon|G‘ishtmon|Katta Beshkapa|Langar|Loyson|O‘qchi|Paxtakor|Qizil ariq|Qorajiyda|Qorakaltak|Qoraqo‘shchi|Qumtepa|Quyi Oqtepa|Sarmozor|Shahartepa|Solijonobod|Xalqabod|Xotinariq|Yangiariq|Yo‘ldoshobod"],["Quva tumani","Akbarabad|Bahor|Baynalminal|Damariq|Dehqonobod|Guliston|Iftixor|Ittifoq|Jalayer|Madaniyat|Mustaqillik|Namuna|Oltinariq|O‘zbek|Pastki Xo‘ja Xasan|Qandabuloq|Qaqir|Qayirma|Qorashox|Quva|Sanoatchilar|Soyguzar|Tolmozor|Turk|Turkrovot|Yangihayot|Yuziya"],["Rishton tumani","Avazboy|Beshkapa|Bo‘ston|Bujay|Do‘tir|Mehnatobod|Oq-oltin|Oq-yer|O‘smonxo‘jayev|O‘yrat|Pandigon|Qayrag‘och|Rishton|Saxovat|To‘da|Xurramobod|Yoyilma|Zoxidon"],["So‘x tumani","Hushyor|Qal’a|Ravon|Sarikanda|Sohibkor|So‘x|Tarovatli|Tul"],["Toshloq tumani","Arabmozor|Axshak|Nayman|Naymanbo‘ston|Qo‘rg‘oncha|Qumariq|Quyi Nayman|Quyi Yakkatut|Sadda|Toshloq|Turvat|Varzak|Yakkatut|Zarkent"],["Uchko‘prik tumani","Begobod|Bog‘ibo‘ston|Chorbog‘|G‘ijdan|G‘ijdon|Katta Qashqar|Kenagas|Mirzaxo‘ja|Navro‘z|Obod diyor|Palaxon|Qumariqobod|Sariqo‘rg‘on|Sobirjon|Turg‘oq|Uchko‘prik|Yangiqishloq"],["Yozyovon tumani","Guliston|Ishtirxon|Istiqlol|Karatepa|Kelajak|Qatortol|Qorasoqol|Qoratepa|Quyi Soybo‘yi|Toshxovuz|Xonobod|Yangibo‘ston|Yangiobod|Yozyovon|Yozyovon chek|Yo‘ldoshobod"],["Farg‘ona",""],["Marg‘ilon","Marg‘ilon shahar xokimligiga qarashli shaharchalar|Yangi Marg‘ilon"],["Qo‘qon","Muqimiy|Qo‘qon shahar xokimligiga qarashli shaharchalar"],["Quvasoy","Arsif|Do‘stlik|Isfayramsoy|Muyon|Qo‘chqorchi|Quvasoy shahar xokimligiga qarashli shaharchalar|So‘fon|Valik"]],"Xorazm":[["Bog‘ot tumani","Beshariq|Bog‘ot|Dehqonbozor|Madaniyat|Mirishkor|Nayman|Nurafshon|Oltinqum|O‘g‘uzrabot|Qipchoq|Qorayong‘oq|Qulonqorabog‘|Uzumzor|Xo‘jalik|Yangiqadam"],["Gurlan tumani","Birlashgan|Bo‘zqal’a|Chakkalar|Do‘simbiy|Eshimjiron|Guliston|Gurlan|Markaziy Guliston|Nukus yop|Nurzamin|Olg‘a|Saxtiyon|Sholikor|Taxtako‘pir|Vazir|Xizireli|Yormish"],["Qo‘shko‘pir tumani","G‘ozovot|Kenagas|Oqdarband|O‘rta qishloq|O‘rtayap|O‘zbekyap|Qoromon|Qotog‘on|Qo‘shko‘pir|Sherobod|Shix|Shixmashhad|Xadra|Xayrobod|Xonbod|Xonobod|Xosiyon|Yangilik"],["Shovot tumani","Beshmergan|Bo‘yrochi|Bo‘yroqchi|Chig‘atoy|Chig‘atoyqal’a|Cho‘qli|Hurriyat|Ijtimoyat|Ipakchi|Kangli|Monoq|O‘zbekiston|Qat-qal’a|Qiyot|Shovot|Shovotqal’a"],["Tuproqqal’a tumani",""],["Urganch tumani","Bekobod|Chakkasholikor|Chandir|Chandirkiyat|Cholish|Cnatko‘pir|Gardonlar|G‘alaba|G‘aybu|Ko‘palik|Oq oltin|Qoromon|Qoroul|Yuqori bog‘|Yuqori do‘rman"],["Xazorasp tumani","Beshta|Bo‘ston|Karvak|Muxomon|Nurxayot|Oq yop|Ovshar|Oyok ovvo|Pichoqchi|Pitnak|Sanoat|Sarimoy|Tuproqqal’a|Xazorasp|Yangibozor"],["Xiva tumani","Chinobod|Dashyoq|Eski-Qiyot|Gandimyon|Gullanbog‘|Hamkor|Iftixor|Irdinzon|Juryon|Oq-yop|Parchanxos|Sayot|Shomoxulum|Sho‘r-Qal’a|Yuqori qo‘m"],["Xonqa tumani","Amudaryo|Birlashgan|Istiqlol|Katta Jirmiz|Madaniy yer|Madir|Namuna|Navxos|Olaja|Qirq-yop|Qoraqosh|Sarapoyon|Tomadurgadik|Xonqa|Yosh kuch"],["Yangiariq tumani","Chiriqchi|Gulbog‘|Gullanbog‘|Gulobod|Kattabog‘|Ostona|Qarmish|Qo‘riqtom|Qo‘shloq|Soburzon|Suvgan|Tagan|Yangiariq"],["Yangibozor tumani","Bog‘olon|Boshkirshix|Bo‘zqal’a|Cho‘bolonchi|Mangitlar|Oyoqdo‘rman|Qalandardo‘rman|Shirinqo‘ng‘irot|Uyg‘ur|Yangi yop|Yangibozor"],["Urganch",""],["Xiva",""]],"Sirdaryo":[["Boyovut tumani","Bekat|Boyovut|Buyuk yurt|Darvazakir|Dehqonobod|Do‘stlik|G‘allakor|Laylakko‘l|Madaniyat|Markaz|Mingchinor|Olmazor|Tabarruk|Tinchlik"],["Guliston tumani","Beshbuloq|Chortoq|Dehqonobod|Hulkar|Kunchi|Oltin O‘rda|Oltintepa|Soxilobod|Soyibobod|Ulug‘bek|Xalqako‘l|Xumo|Zarbdor"],["Mirzaobod tumani","Bahoriston|Birlashgan|Mehnatobod|Mirzacho‘l|Navbahor|Navro‘z|Nurafshon|Oqoltin|Toshkent|Yo‘ldoshobod"],["Oqoltin tumani","Ahillik|Andijon|Bo‘ston|Farg‘ona|Sardoba|Shodlik"],["Sardoba tumani","Cho‘lquvar|Guliston|Gulzor|Paxtaobod|Qo‘rg‘ontepa|Yangiobod|Yangiqishloq"],["Sayxunobod tumani","Guliston|Istiqlol|Ittifak|Nurota|O‘zbekiston|Paxtakon|Sayxun|Sho‘ro‘zak|Sohil|Yangihayot"],["Sirdaryo tumani","Baxt|Cho‘lto‘qay|J.Mamanov|Malik|Oydin|Paxtazor|Quyosh|Sholikor|Sirdaryo|Turon|Xalqobod|Xaqiqat|Ziyokor"],["Xovos tumani","Binokor|Chamanzor|Farxod|Gulbahor|Paxtakor|Qahramon|Soxibkor|Turkiston|Xovos|Xovotog‘|Xusnobod|Zafarobod"],["Baxt shaxar",""],["Guliston","Bahor|Do‘stlik|Ulug‘obod"],["Shirin",""],["Yangiyer",""]],"Samarqand":[["Bulung‘ur tumani","Beshqo‘ton|Bog‘bon|Bulung‘ur|F.Yo‘ldoshev nomli|Kildon|Kulchabiy|Navoiy nomli|O‘rtabuloq|Soxibkor"],["Ishtixon tumani","Azamat|Bahrin|Chordara|Damariq|Fayziobod|Halqabod|Haqiqat|Ishtixon|Mitan|Odil|O‘rtaqishloq|Qirqyigit|Qurli|Ravot|Shayxislom|Sheyxlar|Sug‘ot|Xalqobod|Yangikent|Yangirabot|Zarband"],["Jomboy tumani","Dehqonobod|Eski Jomboy|G‘azira|Jomboy|Juriyat|Kattaqishloq|Qangli|Qoramuyin|Qo‘ng‘irot|Sherqo‘rg‘on|Xolvoyi|Xo‘ja"],["Kattaqo‘rg‘on tumani","Durbesh|Girdiqo‘rg‘on|Jumaboy|Kattako‘rpa|Kattaming|Kichikmundiyon|Moybuloq|Mundiyon|Omonboy|Payshanba|Polvontepa|Qoradaryo|Qo‘shtepa|Saroyqo‘rg‘on|Suv xovuzi|Vayrat|Yangiqo‘rg‘oncha"],["Narpay tumani","Balandqo‘rg‘on|Chaqar|Guliston|Islom Shoir|Kosogoron|Mirbozor|Oltio‘g‘il|Oqtosh|Qadim|Qorako‘l|Qorasiyrak|Qo‘yi Charxin|Yangirabod"],["Nurobod tumani","Jarquduq|Jom|Nurbuloq|Nurobod|Sazog‘on|Tim|Tutli|Ulus"],["Oqdaryo tumani","A.Navoiy|Avazali|Bolta|Dahbed|Kumushkent|Loyish|Oqdaryo|Oytamg‘ali|Primkent|Qirqdarxon|Qorateri|Yangikent|Yangiobod|Yangiqo‘rg‘on|Zarafshon"],["Pastdarg‘om tumani","Agron|Anxor|Arabxona|Balhiyon|Besh qahramon|Bolatosh|Charxin|Chimboy|Chortut|Dimishkibolo|Do‘rmontepa|Go‘zalkent|Hindiboyi|Iskandari|Jag‘alboyli|Juma|Mehnat|Namuna|Nayman|O‘rta Charxin|Po‘latchi|Sanchikul|Saribosh|Torariq"],["Paxtachi tumani","Do‘stobod|Karnab|Misit|Past Burkut|Qodirist|Quyiboq|Sanchiqul|Sultonobod|Suluvqo‘rg‘on|Urgich|Xayrobod|Xumor|Yuqori Po‘latchi|Ziyovuddin"],["Payariq tumani","Birlashgan|Chelak|Choparoshli|Choshtepa|Do‘stlarobod|Do‘stlik|Guliston|G‘ujumsoy|Ko‘kdala|Ko‘ksaroy|Ko‘lto‘sin|Oqqo‘rg‘on|Oytamg‘ali|O‘rta saydov|Payariq|Qorasuv|Sanoat|Tomoyrat|Tupolos|Xo‘ja Ismoil"],["Qo‘shrabot tumani","Jush|Oqtepa|Oxunboboyev nomli|Pichat|Qo‘shrabot|Urgandji|Zarkent|Zarmitan"],["Samarqand tumani","Bog‘ibaland|Dashtakibolo|Gulobod|Kattaqo‘rg‘onariq|Kulbaipoyon|Ohalik|Qaynama|Qo‘shtamg‘ali|Ulug‘bek|Xo‘ja Ahrori Vali"],["Tayloq tumani","Adas|Bog‘izag‘on|G‘o‘lba|Jumabozor|Madaniyat|Qo‘rg‘oncha|Sochakibolo|Tepaqishloq|Toyloq"],["Urgut tumani","Baxrin|Beshbuloq|Buloqboshi|G‘o‘s|Ilonli|Ispanza|Jartepa|Kamangaron|Kenagas|Mirzaqishloq|Pochvon|Qoratepa|Uramas|Urgut|Yangiariq"],["Kattaqo‘rg‘on","Ingichka|Kattaqo‘rg‘on shahar xokimiyatiga qarashli shaharchalar"],["Samarqand","Farxod|Kimyogarlar|Samarqand shahar xokimiyatiga qarashli shaharchalar|Xishrav"]],"Buxoro":[["Buxoro tumani","Arabxona|Bog‘ikalon|Dexcha|Gala Osiyo|Gulshanobod|Istiqbol|Ko‘chko‘mar|Kunjiqal’a|O‘rta Novmetan|Podshoyi|Qavola Maxmud|Rabotak|Rabotiqalmoq|Saxovat|Shergiron|Shexoncha|Sohibkor|So‘fikorgar|Xumini bolo|Yangi Turmush|Yangiobod"],["G‘ijduvon tumani","Abadi|Armechan|Beshtuvo|Buktaroy|Chag‘dari|Dodarak|Firishkent|G.Yunusov nomli|Gajdumak|G‘ijduvon|G‘ovshun|Jovgari|Ko‘kcha|Ko‘lijabbor|Mazragan|Namatgaron|O‘zanon|Paxtaobod|Pozagari|Qaraxoni|Sarmijon|Sarvari|Soktari|Ulfatbibi|Xatcha|Yuqori Qumoq|Yuqori Rostgo‘y|Zafarabad|Zarangari"],["Jondor tumani","Aleli|Chorzona|Dalmun|Jondor|Ko‘liyon|Lolo|Mirzayon|Mustaqillik|Oxshix|Paxlavon|Po‘loti|Qaroli|Romish|Samonchuq|Tobagar|Ushot|Xazorman|Xumdonak|Xumini bolo|Zarafshon"],["Kogon tumani","B.Naqshband|Beklar|Guliston|Kogon|Niyozhoji|Nurafshon|Sarayon|Sarayonobod|Tutikunda|Xo‘ja Yakshaba|Yangixayot"],["Olot tumani","Bahoriston|Bo‘ribek Chandir|Chandir|Chorbog‘|Chovdur|Denov|Ganchi Chandir|Guliston|Jayxunobod|Jumabozor|Kesakli|Olot|O‘zbekiston|Paxtakor|Qirlishon|Qirtay|Sola qorovul|Soyin-qorovul|Talqon-sayyot"],["Peshku tumani","Bog‘imuso|Chibog‘oni|Ibn Sino nomli|Jonkeldi|Mahallai-Mirishkor|Peshku|Qal’ai Mirishkor|Qoraqalpoq|Shavgon|Varaxsho|Yangibozor|Zandani"],["Qorako‘l tumani","Bandboshi|Chandir|Chandirobod|Chovli|Darg‘abog‘i|Darg‘ali|Jig‘achi|Kulonchi|Mallaishayx|Mirzaqal’a|Qorahoji|Qorako‘l|Qoraun|Qozon|Quvvacha|Quyi Yangibozor|Sayyod|Sayyot|Sho‘rabot|Sho‘rrabot|Solur|Yakka A’lam|Yangiqal’a|Ziyorat"],["Qorovulbozor tumani","Bo‘ston|Buzachi|Jarqoq|Navbahor|Qorovulbozor"],["Romitan tumani","Bog‘iturkon|Chelong‘u|Gazli|Qizil Ravot|Qoqishtuvon|Qo‘rg‘on|Romitan|Sho‘rcha|Xosa|Yuqori G‘azberon"],["Shofirkon tumani","Bog‘iafzal|Chandir|Denov|Do‘rmon|G‘ulomte|Iskogare|Jo‘ynav|Jo‘yrabot|Mazlaxon chandir|Mirzoqul|Quyi Chuqurak|Savrak|Sh.Hamroyev nomli|Shofirkon|Sulton Jo‘ra|Talisafed|Tezguzar|Undare|Vargonze"],["Vobkent tumani","Exson|Imomqazixon|Kosari|Kumushkent|Navbahor|Pirmast|Qipchoq|Qo‘ng‘irot|Roxkent|Shirin|Vobkent|Xalach|Xayrobotcha|Xayrxush|Yangikent"],["Buxoro","Otbozor|Shirbuddin"],["Kogon",""]],"Qashqadaryo":[["Chiroqchi tumani","Ayritom|Chiroqchi|Chiyal|Dam|Dodiq|Eski Anxor|Jar|Ko‘kdala|Langar|Mirzato‘p|Nurafshon|Olmazor|O‘ymovut|Pakandi|Paxtaobod|Qahramon|Qalqama|Qumdaryo|Sho‘rquduq|Taraqqiyot|Torjilg‘a|Uymovut|Uyshun|Xumo|Yangihayot"],["Dehqonobod tumani","Beshbuloq|Beshqo‘ton|Bibiqorasoch|Boshchorbog‘|Bozortepa|Dehqonobod|Duob|Karashina|Obiravon|Oqirtma|Oqqishloq|Oqrabod|Oqtosh|O‘zbekiston|Qirqquloch|Qizilcha|Qo‘rg‘ontosh"],["G‘uzor tumani","Batosh|Bo‘ston|Guliston|Gulshan|G‘uzor|Jarariq|Mash’al|Mehnatobod|Obihayot|Pachkamar|Qorako‘l|Qo‘shtepa|Shakarbuloq|Sherali|Xalqabod|Yangikent|Zarbdor"],["Kasbi tumani","Cho‘lquvar|Denov|Do‘stlik|Fazli|G‘alaba|Kasbi|Komilon|Maymanoq|Mug‘lon|Paxtakor|Qamashi|Qatag‘an|Qatag‘on|Qoraqo‘ng‘irot|Xo‘jakasbi|Yangi qishloq|Yuksalish"],["Kitob tumani","Alaqo‘yliq|Baxtdarvozasi|Bektemir|Beshterak|Bog‘bon|Jilisuv|Kitob|Makrid|Obikanda|Panji|Paxtaobod|Qatorbog‘|Qaynarbuloq|Qo‘yioqboy|Rus qishloq|Sariosiyo|Sevaz|Tagob|Tupchoq|Varganza|Xoji|Yakkatut|Yangiobod"],["Koson tumani","Alachabob|Boyg‘undi|Boyterak|Do‘stlik|Esaboy|Gulbog‘|Gulobod|Guvalak|Istiqlol|Koson|Mudin|Obod|Oqtepa|Po‘lati|Pudina|Qo‘ng‘irtog‘|Qo‘yi Obron|Rahimso‘fi|Rudaksoy|Surhon|Tinchlik|To‘lg‘a"],["Ko‘kdala tumani",""],["Mirishkor tumani","Bo‘ston|Chamanzor|Chandir|Guliston|Gulshanbog‘|Jeynov|Mirishkor|Navbahor|Obod|Pomuq|Vori|Yangi Mirishkor|Yangiobod"],["Muborak tumani","Baxt|Diyonat|Muborak|Qarliq|Qoraqum|Sariq|Shayx"],["Nishon tumani","Balxiyak|Guliston|Navro‘z|Nishon|Nuriston|Oq oltin|Oydin|Oydinlik|Paxtachi|Paxtaobod|Paxtazor|Qirqquloch|Samarqand|Sardoba|Shirinobod|Talimarjon|Yangi Nishon"],["Qamashi tumani","Badahshon|Balandchayla|Chim|Jonbo‘zsoy|Ko‘kbuloq|Loyqasoy|Qamashi|Qamay|Qiziltepa|Qorabog‘|Qoratepa|Rabod|Sarbozor|To‘qboy|Yortepa"],["Qarshi tumani","Beshkent|Bog‘obod|Chaman|Charag‘il|Cho‘libo‘ston|Dasht|Fayzobod|G‘ubdin|Hilol|Jumabozor|Kat|Kuchkak|Lag‘mon|Mirmiron|Mustaqillik|Navbahor|Navro‘z|Nuqrabod|O‘zbekiston mustaqilligi|Paxtakor|Poshton|Qoratepa|Qovchin|Saroy|Shilvi|Tallikuron|Xonobod|Yangi xayot|Yertepa"],["Shahrisabz tumani","Ammog‘on-1|Anday|Chorshanbe|Do‘xchi|Hisorak|Keldihayot|Kunchiqar|Miraki|Mo‘minobod|Namaton|Oq suv|O‘rtaqo‘rg‘on|O‘zbekiston|Qo‘shqanot|Qumqishloq|Qutchi|Shakarteri|Shamaton|Temirchi|To‘damaydon|Xitoy|Xo‘jaxuroson|Yangiqishloq"],["Yakkabog‘ tumani","Alako‘ylak|Alaqarg‘a|Chaydori|Chubron|Edilbek|Esat|Eski Yakkabog‘|Hiyobon|Jarqirg‘iz|Kattabog‘|Madaniyat|Mevazor|O‘rta|O‘z|Qatag‘on|Qayrag‘och|Qishliq|Qo‘shchinor|Samoq|Sandal|Turon|Yakkabog‘"],["Qarshi","Qarshi  shahar xokimiyatiga qarashli shaharchalar|Qashqadaryo"],["Shahrisabz",""]],"Namangan":[["Chortoq tumani","Alixon|Ayqiron|Baliqli ko‘l|Bog‘iston|Chortoq|Karaskan|Koroskon|Ko‘shan|Muchum|Ora ariq|Pastki Peshqo‘rg‘on|Peshqo‘rg‘on|Saroy|Tinchlik|Xazratishox|Yuqori Peshqo‘rg‘on"],["Chust tumani","Axcha|Baymoq|Chust|G‘ova|Karkidon|Karnon|Og‘asaray|Olmos|Qoraqo‘rg‘on|Sarimsoqtepa|Shoyon|Sho‘rkent|Varzik|Xisorak|Yorqishloq"],["Davlatobod tumani",""],["Kosonsoy tumani","Bog‘ishamol|Chindavul|Chindovul|Chust ko‘cha|Istiqlol|Koson|Kosonsoy|Ozod|Qorasuv|Ququmboy|Shirin|Tergachi|Yangi shahar|Yangiyo‘l|Yoshlik"],["Mingbuloq tumani","Bo‘ston|Dovduq|Go‘rtepa|Gulbog‘|Jo‘masho‘y|Kugolikul|Madyarovul|Mehnatobod|Momoxon|Oltinko‘l|O‘zgarish"],["Namangan tumani","Bog‘ishamol|Istiqlol|Mirishkor|Navbahor|Nurafshon|O‘zbekiston|Qumqo‘rg‘on|Sho‘rqishloq|Sho‘rqo‘rg‘on|Tepaqo‘rg‘on|Toshbuloq|Xonabod"],["Norin tumani","Chambil|Marg‘izor|Marg‘uzar|Norinkapa|Pastki cho‘ja|Paxtaqishloq|Qorateri|Qo‘rg‘ontepa|Sho‘ra|Toshloq|To‘da|Uchtepa|Xaqqulobod|Xo‘jaobod"],["Pop tumani","Chodak|Chorkesar|Chorkesar-2|G‘urumsaroy|Madaniyat|Navbahor|Nayman|Oltinkon|Paxtaobod|Pop|Pungon|Qandig‘on|Qurg‘onobod|Sang|Sirdaryo|Uyg‘ur|Uyg‘ursoy|Xalqobod|Yangi Xo‘jaobod|Yangihayot"],["To‘raqo‘rg‘on tumani","Axsi|Buramatut|Kalvak|Katagansaroy|Katagon|Kichikqurama|Mozorko‘xna|Namdon|Olchin|Oqtosh|Saroy|Sayram|Shaxand|To‘raqo‘rg‘on|Xo‘jand|Yandama|Yettikon|Yortepa"],["Uchqo‘rg‘on tumani","Baxt|O‘zbekiston|Qayqi|Qo‘g‘ay|Qo‘g‘ay-o‘lmas|Uchqo‘rg‘on|Uchyog‘och|Yangi yor|Yangiobod|Yashiq"],["Uychi tumani","Axsi|Birlashgan|Boyog‘on|Churtuk|Fayziobod|G‘ayrat|Jiydakapa|Kichik toshloq|Mashad|O‘nxayat|Soku|Teshiktosh|Uychi|Yorkatay|Yorqo‘rg‘on|Ziyokor"],["Yangi Namangan tumani",""],["Yangiqo‘rg‘on tumani","Bekobod|Birlashkan|G‘ovazon|Iskavot|Istiqlol|Kalisho|Ko‘kyor|Nanay|Navkent|Navro‘zobod|Poromon|Qizil qiyoq|Qorachasho‘rkent|Qorapolvon|Qorayong‘oq|Rovot|Salmon|Sangiston|Sharq yulduzi|Xo‘jasho‘rkent|Yangiqo‘rg‘on|Yumaloqtepa|Zarbdor|Zarkent"],["Namangan",""]],"Navoiy":[["G‘ozg‘on tumani",""],["Karmana tumani","Do‘rmon|Jaloyir|Kamolot|Karmana|Malikrabot|Narpay|Paxtaobod|Podkoron|Uyrot|Xazora|Yangiariq|Yoshlik"],["Konimex tumani","Balaqaraq|Boymurot|Chordara|Karakata|Konimex|Mamiqchi|Sarajal|Sho‘rtepa|Uchtobe|Yangig‘ozg‘on|Yangiobod"],["Navbahor tumani","Arabsaroy|Beshrabot|Ijant|Kalkonota|Keskanterak|Olchin|Quyi Beshrabot|Saroy|Turkiston|Yangi-yo‘l|Yangiqo‘rg‘on"],["Nurota tumani","Chuya|Dehibaland|Gum|G‘ozg‘on|Nurota|Qizilcha|Sentob|Temurqovuq|Yangibino"],["Qiziltepa tumani","Arabon|Baland G‘ardiyon|Bo‘ston|G‘amxo‘r|G‘ardiyon|G‘oyibon|Husbuddin|Oq oltin|Oq soch|Oqmachit|O‘rtaqo‘rg‘on|Qalayn-Azizon|Qiziltepa|Uzilishkent|Vang‘ozi|Xo‘ja-Hasan|Xo‘jaqo‘rg‘on|Yangihayot|Zarmetan|Zarmitan"],["Tomdi tumani","Ayaqquduq|Keregetau|Keriz|Oktau|Shiyeli|Suketti|Tomdibuloq"],["Uchquduq tumani","Altintov|Bozdun|Ko‘kayaz|Mingbuloq|Shalxar|Uchquduq|Uzunquduq"],["Xatirchi tumani","Bog‘chakalon|Bog‘ishamol|G‘alabek|Jaloyir|Ko‘ksaroy|Langar|Olchinobod|O‘zbekiston|Paxtakor|Polvontepa|Pulkan shoir|Qoracha|Qo‘rg‘on|Qo‘shchinor|Sahovat|Tasmachi|Turkman|Xonaqa|Yangi qurilish|Yangirabod"],["Navoiy","Navoiy  shahar xokimiyatiga qarashli shaharchalar|Tinchlik"],["Zarafshon","Muruntau|Zarafshon shahar xokimiyatiga qarashli shaharchalar"]]};
+/* ADM manba: O‘zbekiston SOATO tasniflagichi (github.com/MIMAXUZ/uzbekistan-regions-data) */
+const REGIONS=["Toshkent shahri","Toshkent viloyati","Andijon","Buxoro","Farg‘ona","Jizzax","Xorazm","Namangan","Navoiy","Qashqadaryo","Qoraqalpog‘iston Respublikasi","Samarqand","Sirdaryo","Surxondaryo"];
+const REG_MATCH=[["Tashkent city|Toshkent shahri|город Ташкент","Toshkent shahri"],["Tashkent Region|Toshkent viloyati|Ташкентская","Toshkent viloyati"],["Andij|Андиж","Andijon"],["Bukh|Bux|Бухар","Buxoro"],["Fergh|Farg|Ферган","Farg‘ona"],["Jizz|Djiz|Джиз","Jizzax"],["Khor|Xor|Хорез","Xorazm"],["Naman|Наман","Namangan"],["Navoi|Navoiy|Навои","Navoiy"],["Kashk|Qashq|Кашка","Qashqadaryo"],["Karak|Qoraq|Каракал","Qoraqalpog‘iston Respublikasi"],["Samar|Самар","Samarqand"],["Syrd|Sird|Сырдар","Sirdaryo"],["Surkh|Surx|Сурхан","Surxondaryo"],["Tashkent|Toshkent|Ташкент","Toshkent shahri"]];
+function admHTML(d){
+  const ds=(ADM[d.region]||[]); const cur=ds.find(x=>x[0]===d.district); const vs=cur&&cur[1]?cur[1].split("|"):[];
+  return `<div class="stack"><div class="field"><label for="f-district">${t("district")}</label><select id="f-district" ${ds.length?"":"disabled"}><option value="">${d.region?t("choose"):t("regionFirst")}</option>${ds.map(x=>`<option ${d.district===x[0]?"selected":""}>${esc(x[0])}</option>`).join("")}${d.district&&!cur?`<option selected>${esc(d.district)}</option>`:""}</select></div>
+  <div class="field"><label for="f-village">${t("village")}</label><input type="text" id="f-village" list="dl-village" value="${esc(d.village||"")}" placeholder="${esc(t("villagePh"))}" autocomplete="off"><datalist id="dl-village">${vs.map(v=>`<option value="${esc(v)}">`).join("")}</datalist></div></div>`;
+}
+const admNorm=x=>String(x||"").toLowerCase().replace(/[‘’'`ʻʼ]/g,"").replace(/\s+(tumani|shahri|district|city|район|город)\b/g,"").replace(/[^a-zа-яё0-9]/gi,"");
+function admGuess(a){
+  const ds=ADM[S.draft.region]||[]; if(!ds.length) return;
+  const cands=[a.county,a.city_district,a.city,a.town,a.municipality].filter(Boolean).map(admNorm);
+  if(!S.draft.district){const m=ds.find(x=>cands.some(c=>c&&(admNorm(x[0])===c||c.includes(admNorm(x[0]))||admNorm(x[0]).includes(c)))); if(m) S.draft.district=m[0]}
+  if(!S.draft.village){const v=a.village||a.hamlet||a.neighbourhood||a.suburb||a.quarter; if(v) S.draft.village=v}
+  const box=document.getElementById("adm-box"); if(box) box.innerHTML=admHTML(S.draft); save();
+}
+/* ---------- HCM: piyoda kutish vaqti (svetoforli / svetoforsiz) ---------- */
+const isSig=c=>c==="sig"||c==="btn"||c==="reg";
+const numv=v=>{const x=parseFloat(String(v??"").replace(",","."));return isFinite(x)?x:null};
+const LOS_SIG_DELAY=[10,20,30,40,60], LOS_UNS_DELAY=[5,10,20,30,45], LOS_SCORE=[2.00,2.75,3.50,4.25,5.00];
+const losBy=(x,th)=>x==null?null:("ABCDE"[th.findIndex(v=>x<=v)]||"F");
+function hcm(d){
+  if(!d.control) return null;
+  const lanes=numv(d.lanes);
+  if(isSig(d.control)){
+    const C=numv(d.cycle), g=numv(d.gwalk); if(!C||g==null||g<0||g>C) return {sig:true,ok:false};
+    const dp=Math.pow(C-g,2)/(2*C); const out={sig:true,ok:true,delay:dp,los:losBy(dp,LOS_SIG_DELAY)};
+    const vt=numv(d.vturn), n15=numv(d.n15), v85=numv(d.v85);
+    if(lanes&&vt!=null&&n15!=null&&v85!=null){
+      const Fw=0.681*Math.pow(lanes,0.514), Fv=0.00569*(vt/4), Fs=0.00013*n15*(v85/1.609344), Fd=0.0401*Math.log(Math.max(dp,0.1));
+      out.score=0.5997+Fw+Fv+Fs+Fd; out.losScore=losBy(out.score,LOS_SCORE);
+    }
+    return out;
+  }
+  const v=numv(d.flow); const N=lanes||2; const Lm=numv(d.clen)||(N*3.5); const My=Math.min(Math.max((numv(d.yieldp)||0)/100,0),1);
+  if(v==null) return {sig:false,ok:false};
+  const tc=Lm/1.07+3; if(v<=0) return {sig:false,ok:true,delay:0,los:"A",tc,pd:0};
+  const vs=v/3600, vl=v/N/3600;
+  const Pb=1-Math.exp(-tc*vl), Pd=1-Math.pow(1-Pb,N);
+  const dg=(Math.exp(vs*tc)-vs*tc-1)/vs, dgd=dg/Pd, h=N/vs;
+  const k=(Math.pow(1-Pb+Pb*My,N)-Math.pow(1-Pb,N))/Pd;
+  let sumP=0,dp=0; const n=Math.min(Math.floor(dgd/h),2000);
+  for(let i=1;i<=n;i++){const Py=(Pd-sumP)*k; dp+=h*(i-0.5)*Py; sumP+=Py}
+  dp+=(Pd-sumP)*dgd;
+  return {sig:false,ok:true,delay:dp,los:losBy(dp,LOS_UNS_DELAY),tc,pd:Pd};
+}
+function hcmFormHTML(d){
+  if(!d.control) return `<div class="ghead"><h2>${t("hcmTitle")}</h2></div><p class="note" style="margin:0">${t("ctrlNeed")}</p>`;
+  const f=(id,lab,ph="",step="1")=>`<div class="field"><label for="h-${id}" class="small">${t(lab)}</label><input type="number" inputmode="decimal" step="${step}" id="h-${id}" data-h="${id}" value="${esc(d[id]??"")}" placeholder="${ph}"></div>`;
+  const body=isSig(d.control)
+   ?`<p class="small muted" style="margin:0">${t("hcmSigNote")}</p><div class="grid2">${f("cycle","cycle","90")}${f("gwalk","gwalk","25")}</div><div class="grid3">${f("vturn","vturn","200")}${f("n15","n15","300")}${f("v85","v85","55")}</div><div class="grid3">${f("clen","clenS",t("clenPh"),"0.1")}${f("walk","walkT","7")}<div class="field"><label for="h-vdes" class="small">${t("vdes")}</label><select id="h-vdes" data-hs="vdes"><option value="1.07" ${String(d.vdes||"1.07")==="1.07"?"selected":""}>${t("vStd")}</option><option value="0.84" ${String(d.vdes)==="0.84"?"selected":""}>${t("vOld")}</option></select></div></div>`
+   :`<p class="small muted" style="margin:0">${t("hcmUnsNote")}</p><div class="grid2">${f("flow","flow","900")}${f("yieldp","yieldp","20")}</div><div class="grid2">${f("clen","clen",t("clenPh"),"0.1")}</div>`;
+  return `<div class="ghead"><h2>${t("hcmTitle")}</h2></div>${body}<div id="hcm-out">${hcmOutHTML(d)}</div>`;
+}
+function greenCheck(d){
+  if(!d||!isSig(d.control)) return null; const lanes=numv(d.lanes), L=numv(d.clen)||(lanes?lanes*3.5:null), g=numv(d.gwalk);
+  if(!L||g==null) return null; const W=numv(d.walk)??7, V=numv(d.vdes)||1.07, G=W+L/V; return {L,W,V,G,g,ok:g>=G-1e-9};
+}
+function greenHTML(d){const c=greenCheck(d); if(!c) return ""; return `<div class="small" style="margin-top:6px"><b>${t("gtTitle")}:</b> g = ${fmt(c.g,0)} ${t("sec")} · G<sub>min</sub> = ${fmt(c.W,0)} + ${fmt(c.L,1)}/${fmt(c.V,2)} = <b>${fmt(c.G,1)} ${t("sec")}</b> → <b style="color:${c.ok?"var(--ok,#2e7d32)":"var(--bad,#c62828)"}">${c.ok?t("gtOk"):t("gtBad")}</b></div>`}
+function reqWHTML(d){const p=numv(d.peds); if(p==null) return ""; const W=Math.max(4,p/500); return `${t("reqW")}: <b>${fmt(W,1)} m</b> (${W<6?"1.14.1":"1.14.2"})`}
+function hcmOutHTML(d){
+  const h=hcm(d); if(!h||!h.ok) return greenHTML(d);
+  return `<div class="row" style="gap:10px;margin-top:4px"><span class="badge b${h.los}">${h.los}</span><div><b>${t("delay")}: ${fmt(h.delay,1)} ${t("sec")}</b><div class="small muted">${t("losDelay")}${h.losScore?` · ${t("losScore")}: ${fmt(h.score,2)} → <b>${h.losScore}</b>`:""}${h.tc!=null?` · ${t("tcrit")}: ${fmt(h.tc,1)} ${t("sec")} · ${t("pdelayed")}: ${fmt(h.pd*100,0)}%`:""}</div></div></div>${greenHTML(d)}${sigWarrant(d)?`<p class="note" style="margin:6px 0 0">${t("sigWarrant")}</p>`:""}`;
+}
+function hcmLos(d){const h=hcm(d); if(!h||!h.ok) return null; return h.losScore||h.los}
+/* indikatorni "talab qilinmaydi" deb avtomatik belgilash (maqoladagi standartlar shartlari) */
+function autoNA(){
+  const d=S.draft, lanes=numv(d.lanes), L=numv(d.clen)||(lanes?lanes*3.5:null); d.autoNA=d.autoNA||{};
+  const setNA=(c,cond)=>{ if(cond){ if(d.scores[c]===undefined||d.autoNA[c]){d.scores[c]=-1;d.autoNA[c]=1} } else if(d.autoNA[c]){delete d.scores[c];delete d.autoNA[c]} };
+  if(methodOf(d)==="uz"){autoNAuz(d,lanes,L,setNA);return}
+  const uns=d.control==="uns", flow=numv(d.flow), peds=numv(d.peds);
+  setNA("P05", uns);
+  setNA("P10", uns&&flow!=null&&(flow<600||(peds!=null&&peds<150)));
+  setNA("P08", (L!=null&&L<15)||(uns&&flow!=null&&lanes&&flow/lanes<400));
+  if(sigWarrant(d)){ if(d.scores.P10===undefined||d.autoNA.P10){d.scores.P10=0; d.autoNA.P10=2} } else if(d.autoNA.P10===2){delete d.scores.P10; delete d.autoNA.P10}
+}
+function autoNAuz(d,lanes,L,setNA){
+  const uns=d.control==="uns", flow=numv(d.flow), peds=numv(d.peds);
+  // GOST 23457-86 4.14: svetofor talab qilinmaydi
+  setNA("U06", uns&&flow!=null&&(flow<600||(peds!=null&&peds<150)));
+  // GOST 23457-86 5.3.5: orolcha talab qilinmaydi
+  setNA("U11", (L!=null&&L<15)||(uns&&flow!=null&&lanes&&flow/lanes<400));
+  // svetofor kerak, lekin yo‘q -> U06 = 0
+  if(sigWarrant(d)){ if(d.scores.U06===undefined||d.autoNA.U06){d.scores.U06=0; d.autoNA.U06=2} } else if(d.autoNA.U06===2){delete d.scores.U06; delete d.autoNA.U06}
+}
+function sigWarrant(d){const f=numv(d.flow),p=numv(d.peds); return d.control==="uns"&&f!=null&&p!=null&&f>=600&&p>=150}
+function autoWait(){
+  const d=S.draft; if(methodOf(d)!=="uz") return; let w=null;
+  if(d.control&&isSig(d.control)){const C=numv(d.cycle),g=numv(d.gwalk); if(C&&g!=null&&g>=0&&g<=C) w=C-g}
+  else if(d.control){const h=hcm(d); if(h&&h.ok) w=h.delay}
+  if(w==null){ if(d.autoW){delete d.scores.U04; d.autoW=0} return }
+  if(d.scores.U04===undefined||d.autoW){ d.scores.U04= w<45?1:(w<=60?0.5:0); d.autoW=1 }
+}
+/* ---------- Obyektlar ---------- */
+let pendingDel=null;
+function renderSites(app){
+  let h=header(t("sitesTitle"));
+  if(!S.sites.length) h+=`<p class="muted">${t("empty")}</p>`;
+  else h+=`<div class="list">${S.sites.map(s=>{const r=compute(s);return `<div class="item"><span class="badge b${r.grade}">${r.grade}</span>
+    <div class="meta" data-open="${s.id}"><div class="name">${esc(s.name||"—")}${s.sample?`<span class="tag">${t("sample")}</span>`:""}<span class="tag">${methodOf(s)==="uz"?"UZ-11":"PCLOS-17"}</span></div><div class="small muted">${esc(typeTxt(s))} · ${esc(s.date||"")} · ${r.answered}/${r.total}</div></div>
+    <span class="pct">${fmt(r.pct,1)}%</span>
+    ${pendingDel===s.id?`<span class="confirm"><button class="btn sm danger" data-delyes="${s.id}">${t("yes")}</button><button class="btn sm" data-delno="1">${t("no")}</button></span>`:
+    `<button class="btn sm ibtn" data-edit="${s.id}" aria-label="${t("edit")}" title="${t("edit")}">✎</button><button class="btn sm ghost ibtn" data-del="${s.id}" aria-label="${t("del")}">✕</button>`}</div>`}).join("")}</div>`;
+  h+=`<div class="section"><div class="row"><button class="btn" id="btn-impx">${t("importX")}</button><button class="btn" id="btn-sample">${t("loadSample")}</button></div>
+  <div class="row"><button class="btn" id="btn-expj">${t("exportJ")}</button><button class="btn" id="btn-impj">${t("importJ")}</button></div>
+  ${S.sites.length?(pendingDel==="ALL"?`<div class="row"><span>${t("confirmQ")}</span><button class="btn sm danger" data-delyes="ALL">${t("yes")}</button><button class="btn sm" data-delno="1">${t("no")}</button></div>`:`<button class="btn danger ghost" data-del="ALL">${t("clearAll")}</button>`):""}
+  <p class="note">${t("about")}</p></div>`;
+  app.innerHTML=h;
+}
+
+/* ---------- Statistika ---------- */
+function pearson(a,b){const n=a.length; if(n<3) return NaN; const ma=a.reduce((x,y)=>x+y,0)/n, mb=b.reduce((x,y)=>x+y,0)/n; let sab=0,saa=0,sbb=0; for(let i=0;i<n;i++){const da=a[i]-ma,db=b[i]-mb; sab+=da*db; saa+=da*da; sbb+=db*db} return (saa<1e-12||sbb<1e-12)?NaN:sab/Math.sqrt(saa*sbb)}
+function linreg(x,y){const n=x.length; const mx=x.reduce((a,b)=>a+b,0)/n,my=y.reduce((a,b)=>a+b,0)/n; let sxy=0,sxx=0; for(let i=0;i<n;i++){sxy+=(x[i]-mx)*(y[i]-my); sxx+=(x[i]-mx)**2} if(sxx<1e-12) return null; const b=sxy/sxx; return {a:my-b*mx,b}}
+const piOf=(s,c)=>{const v=s.scores[c]; return v===-1?1:(v??0)}; /* N/A: kamchilik yo‘q deb olinadi */
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function mix(c1,c2,w){/* w: 0..1 share of c1, hex only */ const h=x=>x.replace("#",""); const a=h(c1),b=h(c2); const p=i=>Math.round(parseInt(a.substr(i,2),16)*w+parseInt(b.substr(i,2),16)*(1-w)).toString(16).padStart(2,"0"); return "#"+p(0)+p(2)+p(4)}
+function scoreColor(v){const s=css("--surface"); return v===1?mix(css("--gA"),s,.55):v===0.5?mix(css("--gC"),s,.55):mix(css("--gE"),s,.45)}
+function corrColor(r){if(!isFinite(r)) return "transparent"; const s=css("--surface"); return r>=0?mix(css("--pos"),s,Math.min(1,Math.abs(r))*.75):mix(css("--neg"),s,Math.min(1,Math.abs(r))*.75)}
+function gradeColor(g){return css("--g"+g)}
+function chartDefaults(){
+  if(!window.Chart) return false;
+  Chart.defaults.font.family=css("--font")||"Inter, sans-serif"; Chart.defaults.font.size=11;
+  Chart.defaults.color=css("--muted"); Chart.defaults.borderColor=css("--line");
+  Chart.defaults.plugins.legend.labels.boxWidth=10; Chart.defaults.maintainAspectRatio=false; Chart.defaults.animation=matchMedia("(prefers-reduced-motion: reduce)").matches?false:{duration:350};
+  return true;
+}
+const shortName=(s,n=22)=>{const x=s.name||"—";return x.length>n?x.slice(0,n-1)+"…":x};
+
+/* ---------- Tahlil ---------- */
+let selSite=null, axX="P11", axY="PCLOS";
+function renderCharts(app){
+  let h=header(t("chartsTitle"));
+  if(!MS().length){app.innerHTML=h+`<p class="muted">${t("needSites")}</p>`;return}
+  if(!MS().find(s=>s.id===selSite)) selSite=MS()[0].id;
+  const opts=MS().map(s=>`<option value="${s.id}" ${s.id===selSite?"selected":""}>${esc(shortName(s,40))}</option>`).join("");
+  const varOpts=sel=>[`<option value="PCLOS" ${sel==="PCLOS"?"selected":""}>PCLOS%</option>`].concat(IND.map(d=>`<option value="${d.c}" ${sel===d.c?"selected":""}>${d.c} · ${esc(L(d.n))}</option>`)).join("");
+  const nSites=MS().length, hBar=Math.max(150,nSites*38+50);
+  h+=`
+  <div class="section" style="margin-top:0"><h2>${t("c1")}</h2><p class="small muted">${t("c1n")}</p><div class="chartbox" style="height:${hBar}px"><canvas id="ch1"></canvas></div></div>
+  <div class="section"><h2>${t("c11")}</h2><div class="chartbox" style="height:220px"><canvas id="ch11"></canvas></div></div>
+  <div class="section"><h2>${t("c2")}</h2><p class="small muted">${t("c2n")}</p>
+    <div class="field"><label for="sel-site" class="small">${t("site")}</label><select id="sel-site">${opts}</select></div>
+    <div class="chartbox" style="height:520px"><canvas id="ch2"></canvas></div></div>
+  <div class="section"><h2>${t("c3")}</h2><p class="small muted">${t("c3n")}</p><div class="chartbox" style="height:340px"><canvas id="ch3"></canvas></div></div>
+  <div class="section"><h2>${t("c4")}</h2>${heatmapHTML()}<div class="legend"><span><i style="background:${scoreColor(1)}"></i>1</span><span><i style="background:${scoreColor(.5)}"></i>0,5</span><span><i style="background:${scoreColor(0)}"></i>0</span></div></div>
+  <div class="section"><h2>${t("c5")}</h2><p class="small muted">${t("c5n")}</p><div class="chartbox" style="height:480px"><canvas id="ch5"></canvas></div></div>
+  <div class="section"><h2>${t("c6")}</h2><p class="small muted">${t("c6n")}</p><div class="chartbox" style="height:380px"><canvas id="ch6"></canvas></div>
+    <div class="legend"><span><i style="background:var(--gE)"></i>${t("q1")}</span><span><i style="background:var(--gA)"></i>${t("q2")}</span><span><i style="background:var(--gC)"></i>${t("q4")}</span><span><i style="background:var(--muted)"></i>${t("q3")}</span></div></div>
+  <div class="section"><h2>${t("c7")}</h2><p class="small muted">${t("c7n")}</p><div class="chartbox" style="height:480px"><canvas id="ch7"></canvas></div></div>
+  <div class="section"><h2>${t("c9")}</h2><p class="small muted">${t("c9n")}</p><div class="chartbox" style="height:480px"><canvas id="ch9"></canvas></div></div>
+  <div class="section"><h2>${t("c8")}</h2><p class="small muted">${t("c8n")}</p>${corrHTML()}
+    <div class="legend"><span><i style="background:${corrColor(-1)}"></i>r = −1</span><span><i style="background:${corrColor(0)};border:1px solid var(--line)"></i>0</span><span><i style="background:${corrColor(1)}"></i>r = +1</span></div></div>
+  <div class="section"><h2>${t("c10")}</h2><p class="small muted">${t("c10n")}</p>
+    <div class="grid2"><div class="field"><label for="ax-x" class="small">${t("xAxis")}</label><select id="ax-x">${varOpts(axX)}</select></div><div class="field"><label for="ax-y" class="small">${t("yAxis")}</label><select id="ax-y">${varOpts(axY)}</select></div></div>
+    <p class="small" id="reg-txt" style="margin:0"></p><div class="chartbox" style="height:320px"><canvas id="ch10"></canvas></div></div>`;
+  app.innerHTML=h;
+  if(!chartDefaults()){return}
+  drawAll();
+}
+function heatmapHTML(){
+  return `<div class="scroll"><table class="hm"><thead><tr><th class="l">${t("site")}</th>${IND.map(d=>`<th title="${esc(L(d.n))}">${d.c.slice(1)}</th>`).join("")}<th>%</th></tr></thead><tbody>${
+   MS().map(s=>{const r=compute(s);return `<tr><td class="l" title="${esc(s.name)}">${esc(shortName(s,18))}</td>${IND.map(d=>{const v=s.scores[d.c];return `<td style="background:${v===undefined||v===-1?"transparent":scoreColor(v)};color:var(--ink)">${v===undefined?"·":v===-1?"N/A":String(v).replace(".",",")}</td>`}).join("")}<td><b>${fmt(r.pct,1)}</b></td></tr>`}).join("")}
+   <tr><td class="l"><b>${t("mean")}</b></td>${IND.map(d=>`<td><b>${fmt(MS().reduce((a,s)=>a+piOf(s,d.c),0)/MS().length,2)}</b></td>`).join("")}<td><b>${fmt(MS().reduce((a,s)=>a+compute(s).pct,0)/MS().length,1)}</b></td></tr></tbody></table></div>`;
+}
+function corrHTML(){
+  const cols=IND.map(d=>d.c).concat(["PCLOS"]);
+  const vec=c=> MS().map(s=> c==="PCLOS"?compute(s).pct:piOf(s,c));
+  const V=Object.fromEntries(cols.map(c=>[c,vec(c)]));
+  const lab=c=>c==="PCLOS"?"%":c.slice(1);
+  return `<div class="scroll"><table class="cm"><thead><tr><th class="l"></th>${cols.map(c=>`<th>${lab(c)}</th>`).join("")}</tr></thead><tbody>${
+    cols.map(a=>`<tr><th class="l" title="${a==="PCLOS"?"PCLOS%":esc(L(BYC[a].n))}">${a==="PCLOS"?"PCLOS%":a}</th>${cols.map(b=>{const r=a===b?1:pearson(V[a],V[b]);const ok=isFinite(r)&&!(a===b&&!isFinite(pearson(V[a],V[a])));return `<td style="background:${ok?corrColor(r):"transparent"};color:var(--ink)">${ok?fmt(r,2).replace(/^(-?)0[.,]/,"$1."):"—"}</td>`}).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function drawAll(){
+  const ink=css("--ink"), muted=css("--muted"), line=css("--line"), prim=css("--primary"), soft=css("--primary-soft");
+  const sites=MS(), res=sites.map(compute);
+  // 1. PCLOS% bar with grade bands
+  const bands={id:"bands",afterDatasetsDraw(c){const {ctx,chartArea:a,scales:{x}}=c;ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle=muted;ctx.lineWidth=1;[20,40,60,80].forEach(v=>{const px=x.getPixelForValue(v);ctx.beginPath();ctx.moveTo(px,a.top);ctx.lineTo(px,a.bottom);ctx.stroke()});ctx.restore()}};
+  const valLbl={id:"vl",afterDatasetsDraw(c){const {ctx}=c;ctx.save();ctx.fillStyle=ink;ctx.font="600 11px "+css("--font");c.getDatasetMeta(0).data.forEach((b,i)=>{ctx.textBaseline="middle";ctx.fillText(fmt(res[i].pct,1)+"% · "+res[i].grade,Math.min(b.x+6,c.chartArea.right-60),b.y)});ctx.restore()}};
+  charts.push(new Chart(document.getElementById("ch1"),{type:"bar",data:{labels:sites.map(s=>shortName(s,26)),datasets:[{data:res.map(r=>r.pct),backgroundColor:res.map(r=>gradeColor(r.grade)),borderRadius:4,barThickness:22}]},
+    options:{indexAxis:"y",plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>fmt(i.raw,2)+"%"}}},scales:{x:{min:0,max:100,ticks:{stepSize:20,callback:v=>v+"%"},grid:{color:line}},y:{grid:{display:false},ticks:{color:ink}}}},plugins:[bands,valLbl]}));
+  // 11. grade distribution
+  const gs=["A","B","C","D","E","F"], cnt=gs.map(g=>res.filter(r=>r.grade===g).length);
+  charts.push(new Chart(document.getElementById("ch11"),{type:"bar",data:{labels:gs,datasets:[{data:cnt,backgroundColor:gs.map(gradeColor),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:line}},x:{grid:{display:false},ticks:{color:ink,font:{weight:"700"}}}}}}));
+  // 2. contributions for selected site
+  const s=sites.find(x=>x.id===selSite)||sites[0];
+  charts.push(new Chart(document.getElementById("ch2"),{type:"bar",data:{labels:IND.map(d=>d.c+" "+L(d.n)),datasets:[{label:t("gotten"),data:IND.map(d=>+(ciOf(d.c)*piOf(s,d.c)).toFixed(3)),backgroundColor:prim,borderRadius:3},{label:t("lost"),data:IND.map(d=>+(ciOf(d.c)*(1-piOf(s,d.c))).toFixed(3)),backgroundColor:soft,borderRadius:3}]},
+    options:{indexAxis:"y",plugins:{legend:{position:"top"}},scales:{x:{stacked:true,grid:{color:line},title:{display:true,text:"Ci"}},y:{stacked:true,grid:{display:false},ticks:{color:ink,autoSkip:false,font:{size:10.5}}}}}}));
+  // 3. group radar
+  const pal=[prim,css("--gA"),css("--gD"),css("--gE"),css("--gC"),"#8E5BD9","#1BA3B5","#C2477F"];
+  const grp=st=>GROUPS.map(g=>{let a=0,b=0;g.codes.forEach(c=>{a+=ciOf(c)*piOf(st,c);b+=ciOf(c)});return +(a/b*100).toFixed(1)});
+  const showSites=sites.slice(0,8);
+  charts.push(new Chart(document.getElementById("ch3"),{type:"radar",data:{labels:GROUPS.map(g=>L(g.s)),datasets:showSites.map((st,i)=>({label:shortName(st,20),data:grp(st),borderColor:pal[i%pal.length],backgroundColor:pal[i%pal.length]+"22",pointRadius:3,borderWidth:2}))},
+    options:{plugins:{legend:{position:"bottom"}},scales:{r:{min:0,max:100,ticks:{stepSize:25,backdropColor:"transparent",color:muted},grid:{color:line},angleLines:{color:line},pointLabels:{color:ink,font:{size:12,weight:"600"}}}}}}));
+  // 5. Ci importance
+  const ciArr=IND.map(d=>ciOf(d.c));
+  charts.push(new Chart(document.getElementById("ch5"),{type:"bar",data:{labels:IND.map(d=>d.c+" "+L(d.n)),datasets:[{data:ciArr,backgroundColor:ciArr.map(v=>v>=4?prim:soft),borderColor:prim,borderWidth:1,borderRadius:3}]},
+    options:{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{min:0,max:5,grid:{color:line}},y:{grid:{display:false},ticks:{color:ink,autoSkip:false,font:{size:10.5}}}}}}));
+  // 6. IPA
+  const perf=IND.map(d=>sites.reduce((a,st)=>a+piOf(st,d.c),0)/sites.length);
+  const mI=ciArr.reduce((a,b)=>a+b,0)/17, mP=perf.reduce((a,b)=>a+b,0)/17;
+  const qc=(i,p)=> i>=mI&&p<mP?css("--gE"): i>=mI?css("--gA"): p>=mP?css("--gC"):muted;
+  const ipaLines={id:"ipa",afterDatasetsDraw(c){const {ctx,chartArea:a,scales:{x,y}}=c;ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle=muted;const px=x.getPixelForValue(mI),py=y.getPixelForValue(mP);ctx.beginPath();ctx.moveTo(px,a.top);ctx.lineTo(px,a.bottom);ctx.moveTo(a.left,py);ctx.lineTo(a.right,py);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=ink;ctx.font="600 10px "+css("--font");c.getDatasetMeta(0).data.forEach((pt,i)=>{ctx.fillText(IND[i].c,pt.x+6,pt.y-5)});ctx.restore()}};
+  charts.push(new Chart(document.getElementById("ch6"),{type:"scatter",data:{datasets:[{data:IND.map((d,i)=>({x:ciArr[i],y:perf[i]})),backgroundColor:IND.map((d,i)=>qc(ciArr[i],perf[i])),pointRadius:6,pointHoverRadius:8}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${IND[i.dataIndex].c} ${L(IND[i.dataIndex].n)}: Ci=${fmt(i.raw.x)}, Pi=${fmt(i.raw.y)}`}}},
+    scales:{x:{title:{display:true,text:"Ci"},suggestedMin:Math.min(...ciArr)-.15,suggestedMax:Math.max(...ciArr)+.15,grid:{color:line}},y:{title:{display:true,text:"Pi ("+t("mean")+")"},min:-0.05,max:1.1,afterBuildTicks:a=>{a.ticks=[0,.25,.5,.75,1].map(v=>({value:v}))},grid:{color:line}}}},plugins:[ipaLines]}));
+  // 7. improvement potential (mean over sites), sorted
+  const id=ideal();
+  const pot=IND.map((d,i)=>({d,v:sites.reduce((a,st)=>a+ciOf(d.c)*(1-piOf(st,d.c))/compute(st).ideal*100,0)/sites.length})).sort((a,b)=>b.v-a.v);
+  charts.push(new Chart(document.getElementById("ch7"),{type:"bar",data:{labels:pot.map(x=>x.d.c+" "+L(x.d.n)),datasets:[{data:pot.map(x=>+x.v.toFixed(2)),backgroundColor:pot.map(x=>x.v>0?css("--gD"):line),borderRadius:3}]},
+    options:{indexAxis:"y",plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>"+"+fmt(i.raw,2)+"%"}}},scales:{x:{beginAtZero:true,grid:{color:line},ticks:{callback:v=>"+"+v+"%"}},y:{grid:{display:false},ticks:{color:ink,autoSkip:false,font:{size:10.5}}}}}}));
+  // 9. indicator vs PCLOS r
+  const pv=res.map(r=>r.pct);
+  const rs=IND.map(d=>({d,r:pearson(sites.map(st=>piOf(st,d.c)),pv)}));
+  charts.push(new Chart(document.getElementById("ch9"),{type:"bar",data:{labels:rs.map(x=>x.d.c+" "+L(x.d.n)),datasets:[{data:rs.map(x=>isFinite(x.r)?+x.r.toFixed(3):null),backgroundColor:rs.map(x=>x.r>=0?css("--pos"):css("--neg")),borderRadius:3}]},
+    options:{indexAxis:"y",plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>"r = "+fmt(i.raw,3)}}},scales:{x:{min:-1,max:1,grid:{color:line}},y:{grid:{display:false},ticks:{color:ink,autoSkip:false,font:{size:10.5}}}}}}));
+  drawScatter();
+}
+function drawScatter(){
+  const ink=css("--ink"), line=css("--line"), prim=css("--primary");
+  const val=(st,k)=>k==="PCLOS"?compute(st).pct:piOf(st,k);
+  const xs=MS().map(s=>val(s,axX)), ys=MS().map(s=>val(s,axY));
+  const lr=linreg(xs,ys), r=pearson(xs,ys);
+  const lbl=k=>k==="PCLOS"?"PCLOS%":k+" "+L(BYC[k].n);
+  const ds=[{type:"scatter",label:t("site"),data:xs.map((x,i)=>({x,y:ys[i]})),backgroundColor:MS().map(s=>gradeColor(compute(s).grade)),pointRadius:7,pointHoverRadius:9}];
+  if(lr){const mn=Math.min(...xs),mx=Math.max(...xs);ds.push({type:"line",label:"y = a + bx",data:[{x:mn,y:lr.a+lr.b*mn},{x:mx,y:lr.a+lr.b*mx}],borderColor:prim,borderWidth:2,pointRadius:0,borderDash:[6,4]})}
+  const txt=document.getElementById("reg-txt");
+  if(txt) txt.innerHTML= lr&&isFinite(r)?`r = <b>${fmt(r,3)}</b> · R² = <b>${fmt(r*r,3)}</b> · y = ${fmt(lr.a,2)} ${lr.b>=0?"+":"−"} ${fmt(Math.abs(lr.b),2)}·x · n = ${xs.length}`:`n = ${xs.length} · r = —`;
+  const old=charts.find(c=>c.canvas&&c.canvas.id==="ch10"); if(old){old.destroy(); charts=charts.filter(c=>c!==old)}
+  const isP=k=>k!=="PCLOS";
+  charts.push(new Chart(document.getElementById("ch10"),{data:{datasets:ds},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>i.datasetIndex===0?`${shortName(MS()[i.dataIndex],30)}: (${fmt(i.raw.x)}, ${fmt(i.raw.y)})`:""}}},
+    scales:{x:{type:"linear",title:{display:true,text:lbl(axX),color:ink},min:isP(axX)?-0.15:undefined,max:isP(axX)?1.15:undefined,afterBuildTicks:isP(axX)?(a=>{a.ticks=[0,.5,1].map(v=>({value:v}))}):undefined,grid:{color:line}},y:{title:{display:true,text:lbl(axY),color:ink},min:isP(axY)?-0.15:undefined,max:isP(axY)?1.15:undefined,afterBuildTicks:isP(axY)?(a=>{a.ticks=[0,.5,1].map(v=>({value:v}))}):undefined,grid:{color:line}}}}}));
+}
+
+/* ---------- Jadval ---------- */
+function tableRows(){
+  const head=[t("site"),t("region"),t("district"),t("village"),t("control"),t("type"),t("date"),"lat","lon",...IND.map(d=>d.c),t("sum"),t("ideal"),"PCLOS%",t("grade"),t("desc"),t("need"),t("delay")+" ("+t("sec")+")",t("losDelay"),t("losScore")];
+  const rows=MS().map(s=>{const r=compute(s),G=L(GRADES[r.grade]);return [s.name,s.region||"",s.district||"",s.village||"",s.control?t("ctrl_"+s.control):"",T[S.lang]["shape_"+s.type]||t("typeShort_"+s.type),s.date||"",s.lat||"",s.lon||"",...IND.map(d=>s.scores[d.c]===-1?"N/A":(s.scores[d.c]??"")),+r.sum.toFixed(3),+r.ideal.toFixed(2),+r.pct.toFixed(2),r.grade,G[0],G[1],...(()=>{const h=hcm(s);return h&&h.ok?[+h.delay.toFixed(1),h.los,h.losScore?+h.score.toFixed(2)+" ("+h.losScore+")":""]:["","",""]})()]});
+  return {head,rows};
+}
+function renderTable(app){
+  let h=header(t("tableTitle"));
+  if(!MS().length){app.innerHTML=h+`<p class="muted">${t("empty")}</p>`;return}
+  const res=MS().map(compute);
+  h+=`<div class="scroll"><table><thead><tr><th class="l">${t("site")}</th>${IND.map(d=>`<th title="${esc(L(d.n))}">${d.c}</th>`).join("")}<th>ΣCi·Pi</th><th>%</th><th>${t("grade")}</th></tr>
+   <tr><th class="l small">Ci</th>${IND.map(d=>`<th style="font-weight:500">${fmt(ciOf(d.c))}</th>`).join("")}<th>${fmt(ideal())}</th><th></th><th></th></tr></thead><tbody>
+   ${MS().map((s,i)=>`<tr><td class="l" title="${esc(s.name)}">${esc(shortName(s,20))}</td>${IND.map(d=>`<td>${s.scores[d.c]===-1?"N/A":(s.scores[d.c]??"·")}</td>`).join("")}<td>${fmt(res[i].sum,2)}</td><td><b>${fmt(res[i].pct,2)}</b></td><td><span class="badge b${res[i].grade}" style="width:26px;height:26px;font-size:13px">${res[i].grade}</span></td></tr>`).join("")}
+   </tbody></table></div>
+   <div class="section" style="margin-top:14px"><div class="row"><button class="btn" id="btn-xlsx" style="border-color:var(--primary);color:var(--primary)">${t("exportX")}</button><button class="btn" id="btn-csv">${t("exportC")}</button><button class="btn" id="btn-copy">${t("copy")}</button></div></div>
+   <div class="section"><h2>${t("gradeTable")}</h2><div class="scroll"><table><thead><tr><th>${t("grade")}</th><th>${t("range")}</th><th class="l" style="position:static">${t("desc")}</th></tr></thead><tbody>
+   ${Object.entries(GRADES).map(([g,G])=>`<tr><td><span class="badge b${g}" style="width:26px;height:26px;font-size:13px">${g}</span></td><td>${rangeOf(g)}</td><td style="text-align:left;white-space:normal;min-width:220px">${esc(L(G)[0])}. ${esc(L(G)[1])}.</td></tr>`).join("")}</tbody></table></div></div>`;
+  app.innerHTML=h;
+}
+const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+async function deliverFile(name,b64,mime){
+  if(isNative()){
+    try{const P=window.Capacitor.Plugins; const w=await P.Filesystem.writeFile({path:name,data:b64,directory:"CACHE"}); await P.Share.share({title:name,url:w.uri}); return true}catch(e){toast(t("dlFail"));return false}
+  }
+  const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  if(window.claude&&window.claude.use){
+    let dl=null; try{dl=await window.claude.use("downloads")}catch(e){}
+    if(dl){let fn=name,data=u; const ext=(name.split(".").pop()||"").toLowerCase();
+      if(!["json","csv","xlsx","zip","txt","md","html","svg","png","pdf"].includes(ext)){data=makeZip([{name,data:u}]); fn=name.replace(/\.[^.]+$/,"")+".zip"}
+      try{await dl.save({filename:fn,data});return true}catch(e){if(e&&e.code==="declined")return false; toast(t("dlFail")); return false}}
+  }
+  try{
+    const url=URL.createObjectURL(new Blob([u],{type:mime})); const a=document.createElement("a"); a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000); return true}catch(e){toast(t("dlFail"));return false}
+}
+const b64utf8=s=>btoa(unescape(encodeURIComponent(s)));
+function exportXlsx(){
+  if(!window.XLSX){toast(t("dlFail"));return}
+  const {head,rows}=tableRows(); const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([head,...rows]),"PCLOS_hisoblash");
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["Kod","Indikator","CRF, %","Ci = 1+4·CRF/48","Manba (CRF)","Standart"],...IND.map(d=>[d.c,L(d.n),d.crf||"",ciOf(d.c),d.src||"",L(d.s)]),[],["","Ideal ΣCi","",+ideal().toFixed(2)]]),"Sozlamalar");
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([[t("site"),...IND.map(d=>d.c+" ΔPCLOS%")],...MS().map(s=>[s.name,...IND.map(d=>+(ciOf(d.c)*(1-piOf(s,d.c))/ideal()*100).toFixed(2))])]),"Yaxshilash_salohiyati");
+  const b64=XLSX.write(wb,{bookType:"xlsx",type:"base64"});
+  deliverFile("PCLOS_natijalar_"+new Date().toISOString().slice(0,10)+".xlsx",b64,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+}
+function toDelim(sep){const {head,rows}=tableRows();const q=v=>{v=String(v??"");return sep===","&&/[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v.replace(/\t/g," ")};return [head,...rows].map(r=>r.map(q).join(sep)).join("\n")}
+
+
+/* ---------- GIS xarita va eksport ---------- */
+const WALK_D="M27 2.5a4.5 4.5 0 1 1 0 9a4.5 4.5 0 0 1 0-9zM24.5 13.5c-2.2 0-3.6 1-4.6 2.6l-4.4 7.6c-.6 1.1-.2 2.4.9 3 1.1.6 2.4.2 3-.9l2.4-4.3 1.1 6.6-4.8 15.3c-.4 1.3.3 2.6 1.6 3 1.3.4 2.6-.3 3-1.6l4.2-13.2 3.8 6.2.6 7.6c.1 1.3 1.3 2.3 2.6 2.2 1.3-.1 2.3-1.3 2.2-2.6l-.7-8.3c0-.4-.2-.8-.4-1.1l-4.1-6.8-1.1-7.2 1.5 2.3c.3.5.9.9 1.5 1l5.6.9c1.3.2 2.5-.7 2.7-2 .2-1.3-.7-2.5-2-2.7l-4.6-.7-3.6-5.6c-1-1.5-2.7-2.4-4.5-2.4z";
+function pairSVG(color,w=34){const h=Math.round(w*0.82);return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 66 54"><g fill="${color}" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round" paint-order="stroke"><path transform="translate(-6,3)" d="${WALK_D}"/><path transform="translate(16,3)" d="${WALK_D}"/></g></svg>`}
+const GHEX={A:"#1E8449",B:"#7CC45A",C:"#F7DC1F",D:"#F39C12",E:"#E2402E",F:"#A31F1F"};
+const hasXY=s=>isFinite(parseFloat(s.lat))&&isFinite(parseFloat(s.lon))&&s.lat!==""&&s.lon!=="";
+function renderMap(app){
+  const withXY=MS().filter(hasXY), noXY=MS().filter(s=>!hasXY(s));
+  let h=header(t("mapTitle"));
+  h+=`<p class="small muted" style="margin:0 0 10px">${t("mapNote")}</p>
+  <div class="row" style="margin-bottom:10px"><span class="small muted">${t("mapBy")}:</span><div class="seg" style="flex:1"><button data-mapby="pclos" aria-pressed="${(S.mapBy||"pclos")==="pclos"}">${t("infra")}</button><button data-mapby="hcm" aria-pressed="${S.mapBy==="hcm"}">${t("oper")}</button></div></div><div id="map"></div>
+  ${withXY.length?"":`<p class="note">${t("noneOnMap")}</p>`}
+  ${noXY.length?`<div class="section" style="margin-top:16px"><p class="small muted">${t("noCoords")}</p><div class="list">${noXY.map(s=>{const r=compute(s);return `<div class="item"><span class="badge b${r.grade}" style="width:26px;height:26px;font-size:13px">${r.grade}</span><div class="meta" data-open="${s.id}"><div class="name">${esc(s.name)}</div></div><button class="btn sm ibtn" data-edit="${s.id}" aria-label="${t("edit")}">✎</button></div>`}).join("")}</div></div>`:""}
+  <div class="section"><h2>${t("gisExport")}</h2><p class="small muted">${t("gisNote")}</p>
+   <div class="row"><button class="btn" id="btn-geojson" style="border-color:var(--primary);color:var(--primary)">GeoJSON</button><button class="btn" id="btn-kml">KML</button><button class="btn" id="btn-giszip">${t("zipAll")}</button></div></div>`;
+  app.innerHTML=h;
+  const LF=window.L; if(!LF||!LF.map) return;
+  lmap=LF.map("map",{zoomControl:true,attributionControl:true});
+  LF.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(lmap);
+  LF.control.scale({metric:true,imperial:false,position:"bottomright",maxWidth:140}).addTo(lmap);
+  const North=LF.Control.extend({options:{position:"topright"},onAdd(){const d=LF.DomUtil.create("div","map-north");d.innerHTML='<svg width="34" height="44" viewBox="0 0 34 44"><text x="17" y="11" text-anchor="middle" font-size="11" font-weight="700" fill="#111" font-family="Inter,Arial">N</text><path d="M17 14 L27 40 L17 33 L7 40 Z" fill="#111"/><path d="M17 14 L17 33 L7 40 Z" fill="#fff" stroke="#111" stroke-width="1"/></svg>';return d}});
+  new North().addTo(lmap);
+  const Leg=LF.Control.extend({options:{position:"bottomleft"},onAdd(){const d=LF.DomUtil.create("div","map-legend");d.innerHTML=`<b>${t("mapLegend")} <span class="lg-t">▾</span></b>`+"ABCDEF".split("").map((g,i)=>`<div>${pairSVG(GHEX[g],24)}<span>${S.mapBy==="hcm"?`${g} · ${["≤10 / ≤5","10–20 / 5–10","20–30 / 10–20","30–40 / 20–30","40–60 / 30–45",">60 / >45"][i]} ${t("sec")}`:`${rangeOf(g)} ${g} ${glabel(g)}`}</span></div>`).join("")+(S.mapBy==="hcm"?`<div style="color:#666;font-size:10.5px">${t("hcmLegend")}</div>`:"");LF.DomEvent.disableClickPropagation(d);d.addEventListener("click",()=>{d.classList.toggle("min");d.querySelector(".lg-t").textContent=d.classList.contains("min")?"▸":"▾"});if(window.innerWidth<500&&withXY.length>1)d.classList.add("min");return d}});
+  new Leg().addTo(lmap);
+  const pts=[];
+  withXY.forEach(s=>{const r=compute(s),la=parseFloat(s.lat),lo=parseFloat(s.lon); const hl=hcmLos(s); const g=S.mapBy==="hcm"?hl:r.grade; if(!g) return; pts.push([la,lo]);
+    LF.marker([la,lo],{icon:LF.divIcon({className:"ped-icon",html:pairSVG(GHEX[g],36),iconSize:[36,30],iconAnchor:[18,26],popupAnchor:[0,-22]}),title:s.name}).addTo(lmap)
+     .bindPopup(`<b>${esc(s.name)}</b><br>PCLOS: <b>${r.grade}</b> · ${fmt(r.pct,1)}% · ${esc(glabel(r.grade))}<br>${hl?`HCM LOS: <b>${hl}</b> · ${fmt(hcm(s).delay,1)} ${t("sec")}<br>`:""}<span style="color:#888">${esc(typeTxt(s))} · ${esc(s.date||"")}</span>`);});
+  if(pts.length===1) lmap.setView(pts[0],17); else if(pts.length) lmap.fitBounds(pts,{paddingTopLeft:[40,40],paddingBottomRight:[40,60],maxZoom:17}); else lmap.setView([41.3111,69.2797],12);
+  setTimeout(()=>lmap&&lmap.invalidateSize(),150);
+}
+function featProps(s){const r=compute(s),G=GRADES[r.grade];const p={name:s.name,type:s.type,layout:T.uz["shape_"+s.type]||T.uz["typeShort_"+s.type]||"",region:s.region||"",district:s.district||"",village:s.village||"",control:s.control||"",control_type:s.control?T.uz["ctrl_"+s.control]:"",hcm_delay_s:(()=>{const h=hcm(s);return h&&h.ok?+h.delay.toFixed(1):null})(),hcm_los:hcmLos(s),date:s.date||"",pclos_sum:+r.sum.toFixed(3),pclos_ideal:+r.ideal.toFixed(2),pclos_pct:+r.pct.toFixed(2),grade:r.grade,color:GHEX[r.grade],"marker-color":GHEX[r.grade],"marker-size":"medium",description:G.uz[0],improvement:G.uz[1],scored:r.answered};IND.forEach(d=>p[d.c]=s.scores[d.c]??null);return p}
+function geojsonText(){return JSON.stringify({type:"FeatureCollection",name:"PCLOS_baholash",crs:{type:"name",properties:{name:"urn:ogc:def:crs:OGC:1.3:CRS84"}},features:MS().filter(hasXY).map(s=>({type:"Feature",geometry:{type:"Point",coordinates:[+parseFloat(s.lon).toFixed(7),+parseFloat(s.lat).toFixed(7)]},properties:featProps(s)}))},null,1)}
+function kmlText(){const x=v=>String(v??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));const abgr=h=>"ff"+h.slice(5,7)+h.slice(3,5)+h.slice(1,3);
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>PCLOS baholash</name>\n${Object.entries(GHEX).map(([g,h])=>`<Style id="g${g}"><IconStyle><color>${abgr(h)}</color><scale>1.2</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle><LabelStyle><scale>0.8</scale></LabelStyle></Style>`).join("\n")}\n${
+  MS().filter(hasXY).map(s=>{const p=featProps(s);return `<Placemark><name>${x(p.name)} — ${p.grade} (${p.pclos_pct}%)</name><styleUrl>#g${p.grade}</styleUrl><ExtendedData>${Object.entries(p).filter(([k])=>!k.startsWith("marker")).map(([k,v])=>`<Data name="${x(k)}"><value>${x(v)}</value></Data>`).join("")}</ExtendedData><Point><coordinates>${parseFloat(s.lon)},${parseFloat(s.lat)},0</coordinates></Point></Placemark>`}).join("\n")}\n</Document></kml>`}
+function qmlText(){const rgb=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16)).join(",");const gs=Object.keys(GHEX);
+  return `<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>\n<qgis version="3.28" styleCategories="Symbology"><renderer-v2 type="categorizedSymbol" attr="grade" symbollevels="0" enableorderby="0" forceraster="0"><categories>${gs.map((g,i)=>`<category symbol="${i}" value="${g}" label="${rangeOf(g)} ${g} ${GLABEL.uz['ABCDEF'.indexOf(g)]}" render="true"/>`).join("")}</categories><symbols>${gs.map((g,i)=>`<symbol type="marker" name="${i}" alpha="1" clip_to_extent="1" force_rhr="0"><layer class="SvgMarker" enabled="1" locked="0" pass="0"><prop k="name" v="base64:${btoa(pairSVG(GHEX[g],66))}"/><prop k="color" v="${rgb(GHEX[g])},255"/><prop k="outline_color" v="255,255,255,255"/><prop k="size" v="7"/><prop k="size_unit" v="MM"/><prop k="vertical_anchor_point" v="2"/><prop k="horizontal_anchor_point" v="1"/></layer></symbol>`).join("")}</symbols></renderer-v2></qgis>\n`}
+function gisCsv(){const rows=[["name","lat","lon","pclos_pct","grade","color",...IND.map(d=>d.c)]].concat(MS().filter(hasXY).map(s=>{const p=featProps(s);return [s.name,s.lat,s.lon,p.pclos_pct,p.grade,p.color,...IND.map(d=>s.scores[d.c]??"")]}));return "﻿"+rows.map(r=>r.map(v=>{v=String(v??"");return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(",")).join("\n")}
+/* oddiy ZIP (siqilmagan) */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function makeZip(files){const enc=new TextEncoder();const now=new Date(),dd=((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate(),dt=(now.getHours()<<11)|(now.getMinutes()<<5);const parts=[],cent=[];let off=0;
+  files.forEach(f=>{const nm=enc.encode(f.name),d=typeof f.data==="string"?enc.encode(f.data):f.data,crc=crc32(d);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(10,dt,true);h.setUint16(12,dd,true);h.setUint32(14,crc,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nm.length,true);
+    parts.push(new Uint8Array(h.buffer),nm,d);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(12,dt,true);c.setUint16(14,dd,true);c.setUint32(16,crc,true);c.setUint32(20,d.length,true);c.setUint32(24,d.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+    cent.push(new Uint8Array(c.buffer),nm); off+=30+nm.length+d.length;});
+  const csz=cent.reduce((a,b)=>a+b.length,0);const e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,csz,true);e.setUint32(16,off,true);
+  const all=[...parts,...cent,new Uint8Array(e.buffer)];const out=new Uint8Array(all.reduce((a,b)=>a+b.length,0));let p=0;all.forEach(a=>{out.set(a,p);p+=a.length});return out}
+const u8b64=u=>{let s="";for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+function gisGuard(){if(!MS().some(hasXY)){toast(t("noneOnMap"));return false}return true}
+/* ---------- Sozlamalar ---------- */
+function renderSettings(app){
+  let h=header(t("settingsTitle"));
+  h+=methodSeg()+`<div class="section" style="margin-top:0"><h2>${t("method")}</h2><p>${t("methodText")}</p><p class="small muted">${t("srcUz")}</p>
+   <div class="formula">PCLOS = Σ C<sub>i</sub>·P<sub>i</sub> &nbsp;&nbsp;|&nbsp;&nbsp; PCLOS% = Σ C<sub>i</sub>P<sub>i</sub> / Σ C<sub>i</sub> × 100</div>
+   <p class="small muted">${t("source")}: Transportation Research Board (2010). Highway Capacity Manual 2010, Ch. 18–19. — Ahmed T., Moeinaddini M., Almoshaogeh M., Jamal A., Nawaz I., Alharbi F. (2021). A New Pedestrian Crossing Level of Service (PCLOS) Method for Promoting Safe Pedestrian Crossing in Urban Areas. IJERPH 18(16), 8813. https://doi.org/10.3390/ijerph18168813</p></div>
+  <div class="section"><h2>${t("ciTitle")}</h2><p class="small muted">${t("ciNoteCrf")}</p>
+   <div class="formula">C<sub>i</sub> = 1 + 4 · CRF<sub>i</sub> / CRF<sub>max</sub> &nbsp;(CRF<sub>max</sub> = 48%)</div>
+   <div class="scroll"><table><thead><tr><th class="l">${t("indicator")}</th><th>CRF, %</th><th>C<sub>i</sub></th></tr></thead><tbody>
+   ${IND.map(d=>`<tr><td class="l" style="white-space:normal;min-width:170px"><span class="code">${d.c}</span> ${esc(L(d.n))}<div class="small muted" style="font-size:11px;line-height:1.3;margin-top:2px">${esc(d.src||"")}</div></td><td>${d.crf?d.crf:"—"}</td><td><b>${fmt(d.ci)}</b></td></tr>`).join("")}
+   <tr><td class="l"><b>Σ Ci</b></td><td></td><td><b>${fmt(ideal())}</b></td></tr></tbody></table></div>
+   <p class="small muted">${t("critRule")}</p></div>
+
+  <div class="section"><h2>${t("cutsTitle")}</h2><p class="small muted">${t("cutsNote")}</p>
+   <div class="seg" role="group"><button data-preset="article" aria-pressed="${JSON.stringify(cuts())===JSON.stringify(CUT_PRESETS.article)}">${t("presetArticle")}</button><button data-preset="custom" aria-pressed="${JSON.stringify(cuts())===JSON.stringify(CUT_PRESETS.custom)}">${t("presetCustom")}</button></div>
+   <div class="grid3" style="grid-template-columns:repeat(5,1fr)">${"ABCDE".split("").map((g,i)=>`<div class="field"><label class="small" for="cut-${g}"><span class="badge b${g}" style="width:22px;height:22px;font-size:12px">${g}</span> ≥</label><input type="number" id="cut-${g}" data-cut="${i}" value="${cuts()[i]}" min="0" max="100" step="1" style="padding:8px;min-height:40px;text-align:center"></div>`).join("")}</div></div>
+  <div class="section"><h2>${t("theme")}</h2><div class="seg" role="group">${["auto","light","dark"].map(m=>`<button data-theme-set="${m}" aria-pressed="${S.theme===m}">${t("theme"+m[0].toUpperCase()+m.slice(1))}</button>`).join("")}</div></div>
+  <p class="note" style="margin-top:24px">${t("about")} · PCLOS v1.0</p>`;
+  app.innerHTML=h;
+}
+
+/* ---------- Mutaxassislar so‘rovi ---------- */
+function svList(){S.survey=S.survey||{}; S.survey[S.method]=S.survey[S.method]||[]; return S.survey[S.method]}
+function svMean(c){const v=svList().map(e=>e.r[c]).filter(x=>isFinite(x)); if(!v.length) return null; const m=v.reduce((a,b)=>a+b,0)/v.length; return {mean:m,n:v.length}}
+function surveyHTML(){const E=svList();
+  return `<div class="section"><h2>${t("svTitle")}</h2><p class="small muted">${t("svNote")}</p>
+  ${E.length?`<div class="scroll"><table><thead><tr><th class="l">${t("indicator")}</th>${E.map((e,i)=>`<th>${t("svExp")}${i+1}</th>`).join("")}<th>${t("svMean")}</th><th>${t("svN")}</th></tr></thead><tbody>
+  ${IND.map(d=>{const m=svMean(d.c); return `<tr><td class="l"><span class="code">${d.c}</span></td>${E.map((e,i)=>`<td><input class="cfield" style="width:46px" type="number" min="1" max="5" step="1" inputmode="numeric" data-sv="${i}|${d.c}" value="${e.r[d.c]??""}" aria-label="${t("svExp")}${i+1} ${d.c}"></td>`).join("")}<td><b id="svm-${d.c}">${m?fmt(m.mean,2):"–"}</b></td><td id="svn-${d.c}">${m?m.n:0}</td></tr>`}).join("")}
+  </tbody></table></div>`:`<p class="muted">${t("svEmpty")}</p>`}
+  <div class="row"><button class="btn" id="btn-svadd">${t("svAdd")}</button>${E.length?`<button class="btn ghost" id="btn-svdel">${t("svDel")}</button>`:""}</div>
+  ${E.length?`<div class="row"><button class="btn" id="btn-svapply" style="border-color:var(--primary);color:var(--primary)">${t("svApply")}</button><button class="btn" id="btn-svcsv">${t("svCsv")}</button></div>`:""}</div>`}
+function svCsv(){const E=svList(); const rows=[["code","indicator"].concat(E.map((e,i)=>"E"+(i+1)),["mean","n"])]; IND.forEach(d=>{const m=svMean(d.c); rows.push([d.c,L(d.n)].concat(E.map(e=>e.r[d.c]??""),[m?m.mean.toFixed(2):"",m?m.n:0]))}); return rows.map(r=>r.map(x=>{x=String(x); return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x}).join(",")).join("\r\n")}
+
+/* ---------- Import ---------- */
+function importWorkbook(buf){
+  const wb=XLSX.read(buf,{type:"array"}); let added=0;
+  // Ci (Likert) from Sozlamalar!D3:D19
+
+  const ws=wb.Sheets["PCLOS_hisoblash"]||wb.Sheets[wb.SheetNames.find(n=>/pclos/i.test(n))||wb.SheetNames[0]];
+  const aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+  // find header row with P01
+  let hr=aoa.findIndex(r=>r.some(v=>String(v).trim()==="P01")); if(hr<0) throw new Error("no header");
+  const colOf={}; aoa[hr].forEach((v,j)=>{const k=String(v).trim(); if(BYC[k]) colOf[k]=j});
+  const nameCol=0;
+  for(let i=hr+1;i<aoa.length;i++){const r=aoa[i]; const name=String(r[nameCol]||"").trim(); const sc={}; let any=false;
+    IND_AH.forEach(d=>{const raw=r[colOf[d.c]]; if(raw===""||raw==null) return; const s=String(raw).trim();
+      let v=null; const n=parseFloat(s.replace(",",".")); if(/^[0-9.,]+$/.test(s)&&[0,0.5,1].includes(n)) v=n; else {const o=d.o.find(o=>o.uz===s||o.en===s||o.ru===s); if(o) v=o.v}
+      if(v!==null){sc[d.c]=v;any=true}});
+    if(!any) continue;
+    S.sites.push({method:"ahmed",id:"x"+Date.now().toString(36)+i,name:name||("#"+i),type:/midblock|o‘rta/i.test(name)?"midblock":"intersection",date:new Date().toISOString().slice(0,10),lat:"",lon:"",scores:sc}); added++;}
+  return added;
+}
+
+
+/* ---------- Avtomatik joylashuv ---------- */
+let gps={state:"idle",acc:null,tried:null};
+function gpsStatusHTML(){
+  const d=S.draft;
+  if(gps.state==="wait") return "📍 "+t("gpsWait");
+  if(gps.state==="fail") return t("gpsFail");
+  if(d.lat&&d.lon){const link=`<a href="https://www.openstreetmap.org/?mlat=${encodeURIComponent(d.lat)}&mlon=${encodeURIComponent(d.lon)}#map=18/${encodeURIComponent(d.lat)}/${encodeURIComponent(d.lon)}" target="_blank" rel="noopener">${t("onMap")}</a>`;
+    return (gps.state==="ok"?"📍 "+t("gpsOk")+(gps.acc!=null?` (${t("acc")} ±${Math.round(gps.acc)} m)`:"")+" · ":"")+link}
+  return "";
+}
+function setGpsStatus(){const el=document.getElementById("gps-status"); if(el) el.innerHTML=gpsStatusHTML()}
+function getPosition(){
+  return new Promise(async(res,rej)=>{
+    try{
+      if(isNative()&&window.Capacitor.Plugins.Geolocation){const G=window.Capacitor.Plugins.Geolocation;
+        try{const st=await G.checkPermissions(); if(st.location!=="granted"){const r=await G.requestPermissions(); if(r.location==="denied") return rej("denied")}}catch(e){}
+        const p=await G.getCurrentPosition({enableHighAccuracy:true,timeout:20000,maximumAge:30000}); return res(p.coords)}
+      if(!navigator.geolocation) return rej("none");
+      navigator.geolocation.getCurrentPosition(p=>res(p.coords),e=>rej(e),{enableHighAccuracy:true,timeout:20000,maximumAge:30000});
+    }catch(e){rej(e)}
+  });
+}
+async function reverseName(lat,lon){
+  try{const ctl=new AbortController(); setTimeout(()=>ctl.abort(),8000);
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&lat=${lat}&lon=${lon}&accept-language=${S.lang}`,{signal:ctl.signal,headers:{"Accept":"application/json"}});
+    if(!r.ok) return ""; const j=await r.json(); const a=j.address||{};
+    const st=[a.state,a.city,a.region].filter(Boolean).join(" "); const m=REG_MATCH.find(([re])=>new RegExp(re,"i").test(st)); if(m&&!S.draft.region){S.draft.region=m[1]; const f=document.getElementById("f-region"); if(f) f.value=m[1]; save()} admGuess(a);
+    return [a.road||a.pedestrian||a.neighbourhood, a.suburb||a.city_district||a.city||a.town].filter(Boolean).join(", ");
+  }catch(e){return ""}
+}
+async function locate(auto){
+  const d=S.draft; const key=d.id||"new";
+  if(auto){ if(d.lat||gps.tried===key) return; }
+  gps.tried=key; gps.state="wait"; setGpsStatus();
+  try{
+    const c=await getPosition();
+    if(S.draft!==d) return;
+    d.lat=c.latitude.toFixed(6); d.lon=c.longitude.toFixed(6); gps.acc=c.accuracy; gps.state="ok"; save();
+    const la=document.getElementById("f-lat"), lo=document.getElementById("f-lon"); if(la){la.value=d.lat; lo.value=d.lon}
+    setGpsStatus();
+    if(!d.name||!d.region){const nm=await reverseName(d.lat,d.lon); if(nm&&!S.draft.name&&S.draft===d){d.name=nm; save(); const f=document.getElementById("f-name"); if(f) f.value=nm}}
+  }catch(e){ gps.state= auto?"idle":"fail"; setGpsStatus(); if(!auto) toast(t("gpsFail")) }
+}
+/* ===================== HODISALAR ===================== */
+document.addEventListener("click",async e=>{
+  const m=e.target.closest("[data-open]"); if(m&&!e.target.closest("button")){const s=S.sites.find(x=>x.id===m.dataset.open); if(s){setMethod(methodOf(s)); S.draft=JSON.parse(JSON.stringify(s)); delete S.draft.sample; S.showResult=true; S.tab="assess"; save(); render(); window.scrollTo(0,0)} return}
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.tab){S.tab=b.dataset.tab;pendingDel=null;save();render();window.scrollTo(0,0);return}
+  if(b.dataset.lang){S.lang=b.dataset.lang;save();render();return}
+  if(b.dataset.std){const el=document.getElementById("std-"+b.dataset.std);el.hidden=!el.hidden;b.textContent=t("std")+(el.hidden?" ▾":" ▴");return}
+  if(b.dataset.method){ if(S.method!==b.dataset.method){setMethod(b.dataset.method); if(!S.draft.id){const keep=S.draft; S.draft=blankDraft(); ["name","region","district","village","control","type","date","lat","lon","speed","width","lanes","cycle","gwalk","vturn","n15","v85","flow","yieldp","clen","walk","vdes","peds"].forEach(k=>{if(keep[k]!==undefined)S.draft[k]=keep[k]}); S.draft.method=S.method; autoScoreAll()} else {S.draft=blankDraft()} S.showResult=false; save(); render()} return}
+  if(b.dataset.mapby){S.mapBy=b.dataset.mapby;save();render();return}
+  if(b.dataset.preset){S.cutsBy[S.method]=CUT_PRESETS[b.dataset.preset].slice();save();render();return}
+  if(b.dataset.themeSet){S.theme=b.dataset.themeSet;save();applyTheme();render();return}
+  switch(b.id){
+    case "btn-calc": S.showResult=true; save(); document.getElementById("result-area").innerHTML=resultHTML(S.draft); document.getElementById("result-card").scrollIntoView({behavior:"smooth",block:"center"}); return;
+    case "btn-save": { const d=JSON.parse(JSON.stringify(S.draft)); if(!d.name) d.name=t("site")+" "+(S.sites.length+1);
+      if(d.id){const i=S.sites.findIndex(s=>s.id===d.id); if(i>=0){S.sites[i]=d}else S.sites.push(d); toast(t("updated"))} else {d.id="u"+Date.now().toString(36); S.sites.push(d); toast(t("saved"))}
+      S.draft=blankDraft(); gps.state="idle"; S.showResult=false; save(); render(); window.scrollTo(0,0); return;}
+    case "btn-new": S.draft=blankDraft(); gps.state="idle"; gps.tried=null; S.showResult=false; save(); render(); window.scrollTo(0,0); return;
+    case "btn-gps": locate(false); return;
+    case "btn-sample": SAMPLE.forEach((x,i)=>S.sites.push(mkSample(x,i))); save(); render(); return;
+    case "btn-impx": document.getElementById("fileXlsx").click(); return;
+    case "btn-impj": document.getElementById("fileJson").click(); return;
+    case "btn-expj": deliverFile("PCLOS_zaxira_"+new Date().toISOString().slice(0,10)+".json",b64utf8(JSON.stringify({sites:S.sites,likert:S.likert},null,1)),"application/json"); return;
+    case "btn-xlsx": exportXlsx(); return;
+    case "btn-geojson": if(gisGuard()) deliverFile("PCLOS_baholash.geojson",b64utf8(geojsonText()),"application/geo+json"); return;
+    case "btn-kml": if(gisGuard()) deliverFile("PCLOS_baholash.kml",b64utf8(kmlText()),"application/vnd.google-earth.kml+xml"); return;
+    case "btn-giszip": if(gisGuard()) deliverFile("PCLOS_GIS.zip",u8b64(makeZip([{name:"PCLOS_baholash.geojson",data:geojsonText()},{name:"PCLOS_baholash.kml",data:kmlText()},{name:"PCLOS_baholash.qml",data:qmlText()},{name:"PCLOS_baholash.csv",data:gisCsv()}])),"application/zip"); return;
+    case "btn-csv": deliverFile("PCLOS_natijalar.csv",b64utf8("﻿"+toDelim(",")),"text/csv"); return;
+    case "btn-copy": try{await navigator.clipboard.writeText(toDelim("\t"));toast(t("copied"))}catch(err){toast(t("dlFail"))} return;
+    case "btn-reset": S.likert={}; save(); render(); toast(t("resetDone")); return;
+    case "btn-svadd": svList().push({r:{}}); save(); render(); return;
+    case "btn-svdel": svList().pop(); save(); render(); return;
+    case "btn-svapply": IND.forEach(d=>{const m=svMean(d.c); if(m) S.likert[d.c]=m.mean.toFixed(2)}); save(); render(); toast(t("svApplied")); return;
+    case "btn-svcsv": deliverFile("Ci_sorovnoma_"+S.method+".csv",b64utf8("\ufeff"+svCsv()),"text/csv"); return;
+  }
+  if(b.dataset.edit){const s=S.sites.find(x=>x.id===b.dataset.edit); setMethod(methodOf(s)); S.draft=JSON.parse(JSON.stringify(s)); delete S.draft.sample; S.draft.id=s.id; S.draft.speed=S.draft.speed||"";S.draft.width=S.draft.width||"";S.draft.lanes=S.draft.lanes||""; S.showResult=true; S.tab="assess"; save(); render(); window.scrollTo(0,0); return}
+  if(b.dataset.del){pendingDel=b.dataset.del; render(); return}
+  if(b.dataset.delno){pendingDel=null; render(); return}
+  if(b.dataset.delyes){ if(b.dataset.delyes==="ALL") S.sites=[]; else S.sites=S.sites.filter(s=>s.id!==b.dataset.delyes); pendingDel=null; save(); render(); toast(t("deleted")); return}
+});
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.dataset&&el.dataset.hs){S.draft[el.dataset.hs]=el.value; const o=document.getElementById("hcm-out"); if(o)o.innerHTML=hcmOutHTML(S.draft); if(S.showResult){const ra=document.getElementById("result-area"); if(ra) ra.innerHTML=resultHTML(S.draft)} save(); return}
+  if(el.dataset&&el.dataset.sv){const [i,c]=el.dataset.sv.split("|"); const v=parseFloat(String(el.value).replace(",",".")); const L=svList(); if(!L[+i]) return; if(isFinite(v)&&v>=1&&v<=5) L[+i].r[c]=v; else {delete L[+i].r[c]; el.value=""} save(); const m=svMean(c); const mc=document.getElementById("svm-"+c); if(mc) mc.textContent=m?fmt(m.mean,2):"–"; const nc=document.getElementById("svn-"+c); if(nc) nc.textContent=m?m.n:0; return}
+  if(el.dataset&&el.dataset.code){const c=el.dataset.code; if(S.draft.autoNA) delete S.draft.autoNA[c]; if(c==="U04") S.draft.autoW=0; if(el.value==="") delete S.draft.scores[c]; else S.draft.scores[c]=parseFloat(el.value); updateLive(); return}
+  if(el.dataset&&el.dataset.cut!==undefined){const c=cuts().slice(); const v=parseFloat(el.value); if(isFinite(v)){c[+el.dataset.cut]=v; if(c[0]>c[1]&&c[1]>c[2]&&c[2]>c[3]&&c[3]>=c[4]){S.cutsBy[S.method]=c;save();render()} else {el.value=cuts()[+el.dataset.cut]}} return}
+  if(el.id==="f-type"){S.draft.type=el.value;save();return}
+  if(el.id==="f-region"){S.draft.region=el.value; S.draft.district=""; S.draft.village=""; const box=document.getElementById("adm-box"); if(box) box.innerHTML=admHTML(S.draft); save();return}
+  if(el.id==="f-district"){S.draft.district=el.value; S.draft.village=""; const box=document.getElementById("adm-box"); if(box) box.innerHTML=admHTML(S.draft); save();return}
+  if(el.id==="f-ctrl"){S.draft.control=el.value;autoWait();autoNA();save();render();return}
+  if(el.id==="f-date"){S.draft.date=el.value;save();return}
+  if(el.id==="sel-site"){selSite=el.value; render(); requestAnimationFrame(()=>document.getElementById("ch2")?.scrollIntoView({block:"center"})); return}
+  if(el.id==="ax-x"||el.id==="ax-y"){ if(el.id==="ax-x") axX=el.value; else axY=el.value; drawScatter(); return}
+  if(el.id==="fileXlsx"&&el.files[0]){const f=el.files[0]; f.arrayBuffer().then(buf=>{try{const n=importWorkbook(new Uint8Array(buf)); save(); render(); toast(t("imported")+n)}catch(err){toast(t("importFail"))}}); el.value=""; return}
+  if(el.id==="fileJson"&&el.files[0]){el.files[0].text().then(txt=>{try{const o=JSON.parse(txt); if(Array.isArray(o.sites)){S.sites=S.sites.concat(o.sites.map(s=>({...s,id:(s.id||"j")+Math.random().toString(36).slice(2,6)})))} if(o.likert) S.likert={...S.likert,...o.likert}; save(); render(); toast(t("imported")+(o.sites||[]).length)}catch(err){toast(t("importFail"))}}); el.value=""; return}
+});
+document.addEventListener("input",e=>{
+  const el=e.target;
+  if(el.id==="f-name"){S.draft.name=el.value;save();return}
+  if(el.id==="f-village"){S.draft.village=el.value;save();return}
+  if(el.id==="f-lat"){S.draft.lat=el.value;gps.state="idle";save();return}
+  if(el.id==="f-lon"){S.draft.lon=el.value;save();return}
+  if(el.id==="f-speed"||el.id==="f-width"||el.id==="f-lanes"){const k=el.id.slice(2); S.draft[k]=el.value; autoScore(k,el.value); if(k==="lanes"){autoWait();autoNA()} updateLive(); const o=document.getElementById("hcm-out"); if(o)o.innerHTML=hcmOutHTML(S.draft); return}
+  if(el.id==="f-peds"){S.draft.peds=el.value; if(S.draft.width!=="")autoScore("width",S.draft.width); autoNA(); const rw=document.getElementById("reqw"); if(rw) rw.innerHTML=reqWHTML(S.draft); const o=document.getElementById("hcm-out"); if(o)o.innerHTML=hcmOutHTML(S.draft); updateLive(); return}
+  if(el.dataset&&el.dataset.h){S.draft[el.dataset.h]=el.value; autoWait(); autoNA(); const o=document.getElementById("hcm-out"); if(o)o.innerHTML=hcmOutHTML(S.draft); updateLive(); return}
+  if(el.dataset&&el.dataset.ci){const c=el.dataset.ci; const v=el.value.trim(); if(v==="") delete S.likert[c]; else S.likert[c]=v; document.getElementById("cia-"+c).textContent=fmt(ciOf(c)); document.getElementById("ci-sum").textContent=fmt(ideal()); save(); return}
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>{if(S.tab==="charts") render()});
+applyTheme(); render();
+</script>

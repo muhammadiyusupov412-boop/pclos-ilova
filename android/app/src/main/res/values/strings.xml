@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PCLOS Baholash</string>
+    <string name="title_activity_main">PCLOS Baholash</string>
+    <string name="package_name">uz.pclos.baholash</string>
+    <string name="custom_url_scheme">uz.pclos.baholash</string>
+</resources>
