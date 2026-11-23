@@ -1681,7 +1681,7 @@ document.addEventListener("click",async e=>{
   if(b.dataset.themeSet){S.theme=b.dataset.themeSet;save();applyTheme();render();return}
   switch(b.id){
     case "btn-calc": S.showResult=true; save(); document.getElementById("result-area").innerHTML=resultHTML(S.draft); document.getElementById("result-card").scrollIntoView({behavior:"smooth",block:"center"}); return;
-    case "btn-save": { const d=JSON.parse(JSON.stringify(S.draft)); if(!d.name) d.name=t("site")+" "+(S.sites.length+1);
+    case "btn-save": { autoScoreAll(); const d=JSON.parse(JSON.stringify(S.draft)); if(!d.name) d.name=t("site")+" "+(S.sites.length+1);
       if(d.id){const i=S.sites.findIndex(s=>s.id===d.id); if(i>=0){S.sites[i]=d}else S.sites.push(d); toast(t("updated"))} else {d.id="u"+Date.now().toString(36); S.sites.push(d); toast(t("saved"))}
       S.draft=blankDraft(); gps.state="idle"; S.showResult=false; save(); render(); window.scrollTo(0,0); return;}
     case "btn-new": S.draft=blankDraft(); gps.state="idle"; gps.tried=null; S.showResult=false; save(); render(); window.scrollTo(0,0); return;
@@ -1709,7 +1709,7 @@ document.addEventListener("click",async e=>{
   if(b.dataset.del){pendingDel=b.dataset.del; render(); return}
   if(b.dataset.delno){pendingDel=null; render(); return}
   if(b.dataset.phdel){S.draft.photos=(S.draft.photos||[]).filter(x=>x!==b.dataset.phdel); if(!S.sites.some(s=>(s.photos||[]).includes(b.dataset.phdel))) PDB.del(b.dataset.phdel); save(); render(); return}
-  if(b.dataset.delyes){ const gone=b.dataset.delyes==="ALL"?S.sites:S.sites.filter(s=>s.id===b.dataset.delyes); gone.forEach(s=>(s.photos||[]).forEach(k=>PDB.del(k))); if(b.dataset.delyes==="ALL") S.sites=[]; else S.sites=S.sites.filter(s=>s.id!==b.dataset.delyes); pendingDel=null; save(); render(); toast(t("deleted")); return}
+  if(b.dataset.delyes){ const gone=b.dataset.delyes==="ALL"?S.sites:S.sites.filter(s=>s.id===b.dataset.delyes); if(b.dataset.delyes==="ALL") S.sites=[]; else S.sites=S.sites.filter(s=>s.id!==b.dataset.delyes); const keep=new Set([...S.sites.flatMap(s=>s.photos||[]),...(S.draft.photos||[])]); gone.forEach(s=>(s.photos||[]).forEach(k=>{if(!keep.has(k)) PDB.del(k)})); pendingDel=null; save(); render(); toast(t("deleted")); return}
 });
 document.addEventListener("change",e=>{
   const el=e.target;
