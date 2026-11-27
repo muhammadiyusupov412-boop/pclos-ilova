@@ -8,6 +8,9 @@
         <EditText android:id="@+id/site" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:hint="@string/site_hint" android:inputType="text" />
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/mode_label" android:paddingTop="8dp" android:textStyle="bold" />
+        <Spinner android:id="@+id/mode" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="@string/interval_label" android:paddingTop="8dp" />
         <EditText android:id="@+id/interval" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:inputType="number" android:text="15" />

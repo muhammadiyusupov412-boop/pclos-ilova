@@ -55,6 +55,10 @@ class CountActivity : AppCompatActivity() {
         const val EXTRA_VIDEO = "video"
         const val EXTRA_FPS = "fps"
         const val EXTRA_CONF = "conf"
+        const val EXTRA_MODE = "mode"
+        const val MODE_BOTH = 0
+        const val MODE_PED = 1
+        const val MODE_VEH = 2
         private const val VIDEO_SEGMENT_MS = 60 * 60_000L
     }
 
@@ -86,6 +90,7 @@ class CountActivity : AppCompatActivity() {
     private var recordVideo = false
     private var maxFps = 10
     private var conf = 0.35f
+    private var mode = MODE_BOTH
 
     private val lines = mutableListOf(
         CountLine("1-chiziq (piyoda)", Pt(0.1f, 0.6f), Pt(0.9f, 0.6f), CountLine.Target.PEDESTRIAN),
@@ -103,6 +108,7 @@ class CountActivity : AppCompatActivity() {
         recordVideo = intent.getBooleanExtra(EXTRA_VIDEO, false)
         maxFps = intent.getIntExtra(EXTRA_FPS, 10)
         conf = intent.getFloatExtra(EXTRA_CONF, 0.35f)
+        mode = intent.getIntExtra(EXTRA_MODE, MODE_BOTH)
 
         previewView = findViewById(R.id.preview)
         previewView.scaleType = PreviewView.ScaleType.FIT_CENTER
@@ -110,11 +116,17 @@ class CountActivity : AppCompatActivity() {
         dimView = findViewById(R.id.dim)
         btnStart = findViewById(R.id.btnStart)
         loadLines()
-        overlay.lines = lines
+        overlay.lines = visibleLines()
         overlay.onLinesChanged = { saveLines() }
 
-        findViewById<Button>(R.id.btnLine1).setOnClickListener { editLine(0) }
-        findViewById<Button>(R.id.btnLine2).setOnClickListener { editLine(1) }
+        findViewById<Button>(R.id.btnLine1).apply {
+            setOnClickListener { editLine(0) }
+            visibility = if (mode == MODE_VEH) View.GONE else View.VISIBLE
+        }
+        findViewById<Button>(R.id.btnLine2).apply {
+            setOnClickListener { editLine(1) }
+            visibility = if (mode == MODE_PED) View.GONE else View.VISIBLE
+        }
         btnStart.setOnClickListener { if (running) stopSession() else startSession() }
         findViewById<Button>(R.id.btnDim).setOnClickListener { setDim(true) }
         val gd = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
@@ -126,8 +138,8 @@ class CountActivity : AppCompatActivity() {
         analysisExecutor.execute {
             try {
                 detector = Detector(this).also { it.confThreshold = conf }
-                attr = AttrClassifier.createOrNull(this)
-                if (attr == null) runOnUiThread {
+                attr = if (mode == MODE_VEH) null else AttrClassifier.createOrNull(this)
+                if (attr == null && mode != MODE_VEH) runOnUiThread {
                     Toast.makeText(this, getString(R.string.no_attr_model), Toast.LENGTH_LONG).show()
                 }
             } catch (t: Throwable) {
@@ -139,8 +151,23 @@ class CountActivity : AppCompatActivity() {
 
     private fun editLine(i: Int) {
         if (running) { Toast.makeText(this, R.string.stop_first, Toast.LENGTH_SHORT).show(); return }
-        overlay.editIndex = i
+        overlay.editIndex = overlay.lines.indexOf(lines[i])
         overlay.invalidate()
+    }
+
+    /** Tanlangan rejimga mos chiziqlar. */
+    private fun visibleLines() = lines.filter {
+        when (mode) {
+            MODE_PED -> it.target != CountLine.Target.VEHICLE
+            MODE_VEH -> it.target != CountLine.Target.PEDESTRIAN
+            else -> true
+        }
+    }
+
+    /** Rejimga qarab aniqlashlarni saralash: faqat transportda piyodalar e'tiborga olinmaydi. */
+    private fun filterDets(d: List<uz.pclos.kamera.core.Detection>) = when (mode) {
+        MODE_VEH -> d.filter { it.cls != Coco.PERSON }
+        else -> d  // faqat piyoda rejimida ham velosiped/mototsikl kerak: haydovchini piyodadan ajratish uchun
     }
 
     private fun prefs() = getSharedPreferences("lines_$site", Context.MODE_PRIVATE)
@@ -226,7 +253,7 @@ class CountActivity : AppCompatActivity() {
             val r = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, m, true)
             bmp.recycle(); bmp = r
         }
-        val dets = det.detect(bmp)
+        val dets = filterDets(det.detect(bmp))
         fpsEma = if (fpsEma == 0f) 1000f / dt else 0.9f * fpsEma + 0.1f * (1000f / dt)
 
         val eng = engine
@@ -242,10 +269,10 @@ class CountActivity : AppCompatActivity() {
                     else eng.attrResult(t.id)?.let { "#${t.id} ${it.first}" } ?: "#${t.id} piyoda"
                 } else "#${t.id} ${Coco.vehicleName(t.cls)}"
                 OverlayView.Item(t.box, label, t.isPerson)
-            }
+            }.filter { mode != MODE_PED || it.person }
             if (now - lastIntervalWrite > 30_000) { log?.writeIntervals(); lastIntervalWrite = now }
         } else {
-            items = dets.map { OverlayView.Item(it.box, if (it.cls == Coco.PERSON) "piyoda" else Coco.vehicleName(it.cls), it.cls == Coco.PERSON) }
+            items = dets.filter { mode != MODE_PED || it.cls == Coco.PERSON }.map { OverlayView.Item(it.box, if (it.cls == Coco.PERSON) "piyoda" else Coco.vehicleName(it.cls), it.cls == Coco.PERSON) }
         }
         val stats = buildStats()
         val w = bmp.width; val h = bmp.height
@@ -274,12 +301,17 @@ class CountActivity : AppCompatActivity() {
         out += "%s  %.1f kadr/s  🔋%d%%  %.0f°C".format(Locale.US, if (running) "● YOZILMOQDA" else "○ tayyor", fpsEma, bat, temp)
         if (running) out += "Davomiyligi: %02d:%02d:%02d".format(dur / 3600, dur / 60 % 60, dur % 60)
         val t = log?.totals ?: return out
-        val ped = SessionLog.AGE_GROUPS.map { t["piyoda:$it"] ?: 0 }
-        out += "Piyoda: ${ped.sum()}  (bola ${ped[0]}, kattalar ${ped[1]}, keksa ${ped[2]}, ? ${ped[3]})"
-        val veh = SessionLog.VEHICLES.associateWith { t["transport:$it"] ?: 0 }
-        out += "Transport: ${veh.values.sum()}"
-        out += "  yengil ${veh["yengil"]}, avtobus ${veh["avtobus"]}, yuk ${veh["yuk"]}"
-        out += "  moto ${veh["mototsikl"]}, velo ${veh["velosiped"]}"
+        if (mode != MODE_VEH) {
+            val ped = SessionLog.AGE_GROUPS.map { t["piyoda:$it"] ?: 0 }
+            out += "Piyoda: ${ped.sum()}  (bola ${ped[0]}, kattalar ${ped[1]}, keksa ${ped[2]}, ? ${ped[3]})"
+            out += "  erkak ${t["jins:erkak"] ?: 0}, ayol ${t["jins:ayol"] ?: 0}"
+        }
+        if (mode != MODE_PED) {
+            val veh = SessionLog.VEHICLES.associateWith { t["transport:$it"] ?: 0 }
+            out += "Transport: ${veh.values.sum()}"
+            out += "  yengil ${veh["yengil"]}, avtobus ${veh["avtobus"]}, yuk ${veh["yuk"]}"
+            out += "  moto ${veh["mototsikl"]}, velo ${veh["velosiped"]}"
+        }
         if (temp >= 45f) out += "⚠ Telefon qizib ketdi: soyaga qo'ying"
         return out
     }
@@ -292,7 +324,7 @@ class CountActivity : AppCompatActivity() {
         val dir = File(getExternalFilesDir(null), "PCLOS_Kamera/${safeSite}_$stamp")
         sessionDir = dir
         val l = SessionLog(dir, intervalMin)
-        val lineSnapshot = lines.map { it.copy() }
+        val lineSnapshot = visibleLines().map { it.copy() }
         analysisExecutor.execute {
             log = l
             frameIdx = 0
@@ -323,12 +355,13 @@ class CountActivity : AppCompatActivity() {
         sb.append("chorraha=").append(site).append('\n')
         sb.append("boshlandi=").append(f.format(Date(sessionStart))).append('\n')
         if (end != null) sb.append("tugadi=").append(f.format(Date(end))).append('\n')
+        sb.append("rejim=").append(when (mode) { MODE_PED -> "faqat piyoda"; MODE_VEH -> "faqat transport"; else -> "piyoda va transport" }).append('\n')
         sb.append("interval_daqiqa=").append(intervalMin).append('\n')
         sb.append("kadr_s_chegara=").append(maxFps).append('\n')
         sb.append("ishonch_chegara=").append(conf).append('\n')
         sb.append("yosh_modeli=").append(if (attr != null) "PA-100K PULC" else "yo'q").append('\n')
         sb.append("qurilma=").append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n')
-        for (l in lines) sb.append("chiziq=").append(l.name).append(';')
+        for (l in visibleLines()) sb.append("chiziq=").append(l.name).append(';')
             .append("%.3f,%.3f;%.3f,%.3f".format(Locale.US, l.a.x, l.a.y, l.b.x, l.b.y)).append('\n')
         File(dir, "malumot.txt").writeText(sb.toString())
     }

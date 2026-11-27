@@ -71,6 +71,7 @@ class SessionLog(
         m[k] = (m[k] ?: 0) + 1
         if (e.obj == "piyoda" && e.gender.isNotEmpty()) m["jins:${e.gender}"] = (m["jins:${e.gender}"] ?: 0) + 1
         totals[k] = (totals[k] ?: 0) + 1
+        if (e.obj == "piyoda" && e.gender.isNotEmpty()) totals["jins:${e.gender}"] = (totals["jins:${e.gender}"] ?: 0) + 1
     }
 
     @Synchronized

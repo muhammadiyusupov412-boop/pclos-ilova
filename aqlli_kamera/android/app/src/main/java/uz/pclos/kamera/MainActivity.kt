@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var video: CheckBox
     private lateinit var fps: Spinner
     private lateinit var conf: Spinner
+    private lateinit var mode: Spinner
     private lateinit var sessions: LinearLayout
 
     private val fpsValues = intArrayOf(5, 10, 15)
@@ -43,6 +44,9 @@ class MainActivity : AppCompatActivity() {
         video = findViewById(R.id.video)
         fps = findViewById(R.id.fps)
         conf = findViewById(R.id.conf)
+        mode = findViewById(R.id.mode)
+        mode.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
+            listOf("Piyoda va transport (birga)", "Faqat piyodalar", "Faqat transport"))
         sessions = findViewById(R.id.sessions)
         fps.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
             listOf("5 kadr/s (tejamkor)", "10 kadr/s (tavsiya)", "15 kadr/s (aniq)"))
@@ -52,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         conf.setSelection(1)
         val p = getPreferences(MODE_PRIVATE)
         site.setText(p.getString("site", ""))
+        mode.setSelection(p.getInt("mode", 0))
         findViewById<Button>(R.id.btnGo).setOnClickListener { go() }
     }
 
@@ -65,13 +70,15 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 1)
             return
         }
-        getPreferences(MODE_PRIVATE).edit().putString("site", site.text.toString()).apply()
+        getPreferences(MODE_PRIVATE).edit().putString("site", site.text.toString())
+            .putInt("mode", mode.selectedItemPosition).apply()
         startActivity(Intent(this, CountActivity::class.java).apply {
             putExtra(CountActivity.EXTRA_SITE, site.text.toString().trim())
             putExtra(CountActivity.EXTRA_INTERVAL, interval.text.toString().toIntOrNull()?.coerceIn(1, 60) ?: 15)
             putExtra(CountActivity.EXTRA_VIDEO, video.isChecked)
             putExtra(CountActivity.EXTRA_FPS, fpsValues[fps.selectedItemPosition])
             putExtra(CountActivity.EXTRA_CONF, confValues[conf.selectedItemPosition])
+            putExtra(CountActivity.EXTRA_MODE, mode.selectedItemPosition)
         })
     }
 
