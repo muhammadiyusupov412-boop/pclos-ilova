@@ -1,0 +1,32 @@
+# Kompyuterda video tahlil qilish uchun sozlama (telefon ilovasi bilan bir xil mantiq)
+site_name: "Amir_Temur_Navoiy"
+source: "video.mp4"            # video fayl, 0 (veb-kamera) yoki rtsp://... (IP kamera)
+start_time: "2026-12-01 08:00:00"  # video yozila boshlagan vaqt (15 daqiqalik intervallar shunga bog'lanadi)
+model: "yolo11n.pt"            # aniqroq: yolo11s.pt yoki yolo11m.pt (sekinroq)
+conf: 0.35
+imgsz: 960
+interval_min: 15
+frame_stride: 1                # 2 = har ikkinchi kadr (tezroq)
+output_dir: "natijalar"
+save_video: true
+
+# Sanash chiziqlari: nisbiy koordinatalar (0..1) yoki piksellar
+lines:
+  - name: "piyoda_otish_joyi"
+    p1: [0.10, 0.62]
+    p2: [0.90, 0.62]
+    applies_to: pedestrian
+  - name: "transport_kesimi"
+    p1: [0.50, 0.10]
+    p2: [0.50, 0.95]
+    applies_to: vehicle
+
+# Keltirish koeffitsientlari (o'z me'yoringizga moslang)
+pcu: {yengil: 1.0, mototsikl: 0.5, velosiped: 0.3, avtobus: 2.5, yuk: 2.0}
+
+age:
+  enabled: true
+  model: "ViT-B-32"
+  pretrained: "laion2b_s34b_b79k"
+  min_crop_height: 48
+  samples_per_track: 5

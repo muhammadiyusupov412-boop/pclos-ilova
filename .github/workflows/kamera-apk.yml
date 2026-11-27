@@ -1,0 +1,57 @@
+name: Chorraha Ko‘zi APK
+on:
+  push:
+    paths:
+      - "aqlli_kamera/android/**"
+      - ".github/workflows/kamera-apk.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Piyoda yoshi va jinsi modeli: PaddleClas PULC person_attribute (PA-100K), ONNX ga o'tkaziladi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.10" }
+      - name: Yosh/jins modelini tayyorlash
+        run: |
+          set -e
+          pip install -q six "protobuf<4" "paddle2onnx==1.0.6" "onnx==1.14.1" "onnxruntime==1.20.1" "numpy<2"
+          curl -fsSL -o pa.tar https://paddleclas.bj.bcebos.com/models/PULC/inference/person_attribute_infer.tar
+          tar -xf pa.tar
+          D=$(dirname $(find . -name "inference.pdmodel" | head -1))
+          paddle2onnx --model_dir "$D" --model_filename inference.pdmodel --params_filename inference.pdiparams \
+            --save_file pa100k_attr.onnx --opset_version 11
+          python - <<'PY'
+          import numpy as np, onnxruntime as ort
+          s = ort.InferenceSession("pa100k_attr.onnx")
+          i = s.get_inputs()[0]
+          print("kirish:", i.name, i.shape)
+          o = s.run(None, {i.name: np.random.rand(1, 3, 256, 192).astype("float32")})[0]
+          print("chiqish:", o.shape, float(o.min()), float(o.max()))
+          assert o.shape[-1] == 26
+          PY
+          cp pa100k_attr.onnx aqlli_kamera/android/app/src/main/assets/
+          ls -la aqlli_kamera/android/app/src/main/assets/
+
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - name: Testlar va APK
+        run: cd aqlli_kamera/android && chmod +x gradlew && ./gradlew --no-daemon testDebugUnitTest assembleDebug
+      - run: cp aqlli_kamera/android/app/build/outputs/apk/debug/app-debug.apk Chorraha-Kozi.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Chorraha-Kozi-apk
+          path: Chorraha-Kozi.apk
+      # Telefondan oson yuklab olish: Releases > "kamera-latest"
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: kamera-latest
+          name: Chorraha Ko‘zi (oxirgi versiya)
+          prerelease: true
+          make_latest: false
+          target_commitish: ${{ github.sha }}
+          files: Chorraha-Kozi.apk

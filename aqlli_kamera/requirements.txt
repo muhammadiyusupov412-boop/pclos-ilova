@@ -1,0 +1,7 @@
+ultralytics>=8.3
+open_clip_torch>=2.24
+lap>=0.5
+opencv-python>=4.8
+pandas>=2.0
+openpyxl>=3.1
+pyyaml>=6.0
