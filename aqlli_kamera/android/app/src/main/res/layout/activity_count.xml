@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="#000">
+    <androidx.camera.view.PreviewView android:id="@+id/preview"
+        android:layout_width="match_parent" android:layout_height="match_parent" />
+    <uz.pclos.kamera.OverlayView android:id="@+id/overlay"
+        android:layout_width="match_parent" android:layout_height="match_parent" />
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical" android:orientation="vertical" android:padding="8dp">
+        <Button android:id="@+id/btnLine1" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/line1" />
+        <Button android:id="@+id/btnLine2" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/line2" />
+        <Button android:id="@+id/btnStart" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/start" />
+        <Button android:id="@+id/btnDim" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/dim" />
+    </LinearLayout>
+    <TextView android:id="@+id/dim" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:background="#000" android:gravity="center" android:padding="32dp"
+        android:text="@string/dim_hint" android:textColor="#444" android:visibility="gone" />
+</FrameLayout>

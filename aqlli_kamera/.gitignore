@@ -1,0 +1,4 @@
+__pycache__/
+*.pt
+natijalar/
+.pytest_cache/

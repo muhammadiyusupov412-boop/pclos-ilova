@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">PCLOS Kamera</string>
+    <string name="site_hint">Chorraha nomi (masalan: Amir Temur – Navoiy)</string>
+    <string name="interval_label">Jamlash oralig\'i, daqiqa</string>
+    <string name="video">Videoni ham yozish (Movies/PCLOS_Kamera, har soat alohida fayl)</string>
+    <string name="fps_label">Kadr tezligi</string>
+    <string name="conf_label">Aniqlash ishonch chegarasi</string>
+    <string name="go">Kamerani ochish</string>
+    <string name="sessions">Kuzatuvlar</string>
+    <string name="no_sessions">Hali kuzatuv yo\'q</string>
+    <string name="share">Ulashish</string>
+    <string name="to_downloads">Yuklamalarga</string>
+    <string name="saved_downloads">Download/PCLOS_Kamera/%1$s saqlandi</string>
+    <string name="need_camera">Kameraga ruxsat kerak</string>
+    <string name="line1">1-chiziq</string>
+    <string name="line2">2-chiziq</string>
+    <string name="start">Boshlash</string>
+    <string name="stop">To\'xtatish</string>
+    <string name="dim">Ekranni xiralashtirish</string>
+    <string name="dim_hint">Kuzatuv davom etmoqda. Ekranni yoqish uchun ikki marta bosing.</string>
+    <string name="stop_first">Avval kuzatuvni to\'xtating</string>
+    <string name="model_loading">Model yuklanmoqda, biroz kuting</string>
+    <string name="video_unsupported">Bu telefon video yozish va tahlilni birga qo\'llamaydi: faqat sanash ishlaydi</string>
+    <string name="no_attr_model">Yosh modeli topilmadi: piyodalar yosh guruhisiz sanaladi</string>
+    <string name="saved_to">Saqlandi: %1$s</string>
+    <string name="help">1) Telefonni shtativga, chorrahaga yuqoridan qaratib o\'rnating. 2) «1-chiziq» ni bosib, piyodalar o\'tish joyini kesib o\'tuvchi chiziq torting; «2-chiziq» bilan transport yo\'lini kesuvchi chiziq torting. 3) «Boshlash». Natija har 15 daqiqada intervallar.csv ga yoziladi. Uzoq kuzatuvda powerbank ulang.</string>
+</resources>
