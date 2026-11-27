@@ -92,7 +92,6 @@ class CountingEngine(
 
     private fun finalize(deadIds: Set<Int>, force: Boolean, withAttr: Boolean) {
         val it = pending.iterator()
-        var changed = false
         while (it.hasNext()) {
             val (ev, id) = it.next()
             val samples = attrs[id]?.size ?: 0
@@ -100,7 +99,7 @@ class CountingEngine(
             if (!done) continue
             val (age, gender, conf) = decide(attrs[id] ?: emptyList())
             log.add(ev.copy(category = age, gender = gender, confidence = conf))
-            it.remove(); changed = true
+            it.remove()
         }
         for (id in deadIds) attrs.remove(id)
     }
