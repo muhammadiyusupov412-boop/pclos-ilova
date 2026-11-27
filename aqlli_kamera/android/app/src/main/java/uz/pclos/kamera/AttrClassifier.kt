@@ -12,7 +12,8 @@ import kotlin.math.exp
 
 /**
  * Piyoda atributlari modeli: PaddleClas PULC "person_attribute" (PA-100K ma'lumotlar to'plamida
- * o'qitilgan, 26 atribut). Ishlatiladiganlari: 0 Female, 1 AgeOver60, 2 Age18-60, 3 AgeLess18.
+ * o'qitilgan, 26 atribut). PULC tartibi (PaddleClas attr_rec.py PersonAttribute):
+ * 19 AgeLess18, 20 Age18-60, 21 AgeOver60, 22 Female. (Asl PA-100K tartibidan farq qiladi!)
  * Kirish: 1x3x256x192 RGB, ImageNet normallashtirish.
  */
 class AttrClassifier private constructor(private val session: OrtSession) : AutoCloseable {
@@ -71,7 +72,7 @@ class AttrClassifier private constructor(private val session: OrtSession) : Auto
         }
         val needSigmoid = out.any { it < 0f || it > 1f }
         fun p(i: Int) = if (needSigmoid) 1f / (1f + exp(-out[i])) else out[i]
-        return Attr(child = p(3), adult = p(2), elderly = p(1), female = p(0))
+        return Attr(child = p(19), adult = p(20), elderly = p(21), female = p(22))
     }
 
     override fun close() { session.close() }

@@ -46,8 +46,8 @@ class CountingEngine(
         val f = list.map { it.female }.average().toFloat()
         val (age, conf) = listOf("bola" to c, "kattalar" to a, "keksa" to e).maxByOrNull { it.second }!!
         val gender = when {
-            f >= 0.6f -> "ayol"
-            f <= 0.4f -> "erkak"
+            f >= 0.55f -> "ayol"
+            f <= 0.45f -> "erkak"
             else -> "noaniq"
         }
         val sum = c + a + e
