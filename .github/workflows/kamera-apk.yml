@@ -1,4 +1,4 @@
-name: PCLOS Kamera APK
+name: Chorraha Ko‘zi APK
 on:
   push:
     paths:
@@ -41,17 +41,17 @@ jobs:
         with: { distribution: temurin, java-version: 17 }
       - name: Testlar va APK
         run: cd aqlli_kamera/android && chmod +x gradlew && ./gradlew --no-daemon testDebugUnitTest assembleDebug
-      - run: cp aqlli_kamera/android/app/build/outputs/apk/debug/app-debug.apk PCLOS-Kamera.apk
+      - run: cp aqlli_kamera/android/app/build/outputs/apk/debug/app-debug.apk Chorraha-Kozi.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PCLOS-Kamera-apk
-          path: PCLOS-Kamera.apk
+          name: Chorraha-Kozi-apk
+          path: Chorraha-Kozi.apk
       # Telefondan oson yuklab olish: Releases > "kamera-latest"
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: kamera-latest
-          name: PCLOS Kamera (oxirgi versiya)
+          name: Chorraha Ko‘zi (oxirgi versiya)
           prerelease: true
           make_latest: false
           target_commitish: ${{ github.sha }}
-          files: PCLOS-Kamera.apk
+          files: Chorraha-Kozi.apk

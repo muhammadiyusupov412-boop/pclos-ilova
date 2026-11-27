@@ -1,4 +1,4 @@
-# PCLOS Kamera — piyoda va transport oqimini avtomatik sanash
+# Chorraha Ko‘zi — piyoda va transport oqimini avtomatik sanash
 
 Dissertatsiya tajribasi uchun "aqlli kamera": chorrahada **bir vaqtning o'zida**
 - piyodalarni **soni** va **yosh guruhlari** (bola / kattalar / keksa), qo'shimcha ravishda **jinsi** bo'yicha,
@@ -9,7 +9,7 @@ Ikki qism bor:
 
 | Qism | Qayerda ishlaydi | Nima uchun |
 |---|---|---|
-| `android/` — **PCLOS Kamera** ilovasi | Telefonda (internetsiz) | Dalada jonli sanash |
+| `android/` — **Chorraha Ko‘zi** ilovasi | Telefonda (internetsiz) | Dalada jonli sanash |
 | `kamera/` — Python dastur | Kompyuterda | Yozib olingan videoni qayta tahlil qilish, aniqroq (kattaroq) modellar bilan |
 
 Ikkalasi ham bir xil mantiqda ishlaydi: YOLO11 (COCO) obyektlarni topadi → kuzatuvchi har bir obyektga raqam beradi →
@@ -20,8 +20,8 @@ obyektning "oyog'i" (qutining pastki o'rtasi) chiziqni kesib o'tganda bir marta 
 **Tavsiya etilgan telefon:** Samsung Galaxy A17 (6 GB RAM) yoki shunga o'xshash. Kutilayotgan tezlik: 8–15 kadr/s.
 
 ### O'rnatish
-APK GitHub Actions orqali avtomatik yig'iladi: repozitoriyning **Releases → "PCLOS Kamera (oxirgi versiya)"**
-sahifasidan `PCLOS-Kamera.apk` ni telefonda yuklab oling va o'rnating ("Noma'lum manbalar"ga ruxsat bering).
+APK GitHub Actions orqali avtomatik yig'iladi: repozitoriyning **Releases → "Chorraha Ko‘zi (oxirgi versiya)"**
+sahifasidan `Chorraha-Kozi.apk` ni telefonda yuklab oling va o'rnating ("Noma'lum manbalar"ga ruxsat bering).
 
 ### Dalada ishlatish
 1. Telefonni **shtativga** o'rnating, kamera chorrahaga **yuqoriroqdan va yonroqdan** qarasin (piyodalar bir-birini to'smasin).

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PCLOS Kamera</string>
+    <string name="app_name">Chorraha Ko‘zi</string>
     <string name="site_hint">Chorraha nomi (masalan: Amir Temur – Navoiy)</string>
     <string name="interval_label">Jamlash oralig\'i, daqiqa</string>
     <string name="video">Videoni ham yozish (Movies/PCLOS_Kamera, har soat alohida fayl)</string>
