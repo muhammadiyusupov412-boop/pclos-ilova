@@ -19,12 +19,14 @@ class CountingEngine(
     private val minCropHeightPx: Float = 60f,
     private val maxAttrPerFrame: Int = 2,
     maxAgeFrames: Int = 30,
+    study: StudySetup? = null,
 ) {
     val tracker = Tracker(maxAgeFrames = maxAgeFrames)
     private val counters = lines.map { LineCounter(it) }
     private val attrs = HashMap<Int, MutableList<Attr>>()
     private val lastSampleFrame = HashMap<Int, Int>()
     private val pending = ArrayList<Pair<CountEvent, Int>>()  // piyoda hodisasi, trek id
+    val metrics: StudyMetrics? = study?.let { StudyMetrics(it, log.dir, log::intervalStart) { id -> attrResult(id) } }
 
     var lines: List<CountLine> = lines
         private set
@@ -85,9 +87,10 @@ class CountingEngine(
                 }
             }
         }
+        metrics?.update(tracker.tracks.filter { it.lastFrame == frame && tracker.confirmed(it) }, w, h, nowMs)
         val deadIds = dead.map { it.id }.toSet()
         finalize(deadIds, force = false, withAttr = attr != null)
-        for (id in deadIds) { counters.forEach { it.forget(id) }; lastSampleFrame.remove(id) }
+        for (id in deadIds) { metrics?.forget(id); counters.forEach { it.forget(id) }; lastSampleFrame.remove(id) }
     }
 
     private fun finalize(deadIds: Set<Int>, force: Boolean, withAttr: Boolean) {
@@ -106,6 +109,7 @@ class CountingEngine(
 
     /** Kuzatuv to'xtatilganda: kutilayotgan barcha piyoda hodisalarini yozish. */
     fun flush() {
+        metrics?.flush()
         finalize(emptySet(), force = true, withAttr = true)
         log.writeIntervals()
     }

@@ -7,23 +7,50 @@
             android:text="@string/help" android:textSize="14sp" android:paddingBottom="12dp" />
         <EditText android:id="@+id/site" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:hint="@string/site_hint" android:inputType="text" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/mode_label" android:paddingTop="8dp" android:textStyle="bold" />
+        <TextView style="@style/Lab" android:text="@string/mode_label" android:textStyle="bold" />
         <Spinner android:id="@+id/mode" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/interval_label" android:paddingTop="8dp" />
+
+        <TextView style="@style/Head" android:text="@string/sec_site" />
+        <TextView style="@style/Lab" android:text="@string/control_label" />
+        <Spinner android:id="@+id/control" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+            <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView style="@style/Lab" android:text="@string/lanes_label" />
+                <EditText android:id="@+id/lanes" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:hint="4" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView style="@style/Lab" android:text="@string/cwlen_label" />
+                <EditText android:id="@+id/cwlen" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:hint="14" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView style="@style/Lab" android:text="@string/spdist_label" />
+                <EditText android:id="@+id/spdist" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:hint="20" />
+            </LinearLayout>
+        </LinearLayout>
+        <TextView style="@style/Lab" android:text="@string/weather_label" />
+        <Spinner android:id="@+id/weather" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <TextView style="@style/Lab" android:text="@string/light_label" />
+        <Spinner android:id="@+id/light" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/gps" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/gps" />
+        <TextView android:id="@+id/gpsText" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" />
+        <EditText android:id="@+id/note" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="@string/note_hint" android:inputType="textMultiLine" />
+
+        <TextView style="@style/Head" android:text="@string/sec_tech" />
+        <TextView style="@style/Lab" android:text="@string/interval_label" />
         <EditText android:id="@+id/interval" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:inputType="number" android:text="15" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/fps_label" android:paddingTop="8dp" />
+        <TextView style="@style/Lab" android:text="@string/fps_label" />
         <Spinner android:id="@+id/fps" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/conf_label" android:paddingTop="8dp" />
+        <TextView style="@style/Lab" android:text="@string/conf_label" />
         <Spinner android:id="@+id/conf" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <CheckBox android:id="@+id/video" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="@string/video" android:paddingTop="8dp" />
+
         <Button android:id="@+id/btnGo" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="@string/go" android:layout_marginTop="12dp" />
+        <Button android:id="@+id/btnVideo" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/go_video" />
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="@string/sessions" android:textStyle="bold" android:textSize="18sp" android:paddingTop="20dp" />
         <LinearLayout android:id="@+id/sessions" android:layout_width="match_parent" android:layout_height="wrap_content"

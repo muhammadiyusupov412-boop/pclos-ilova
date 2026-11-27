@@ -7,10 +7,8 @@
         android:layout_width="match_parent" android:layout_height="match_parent" />
     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical" android:orientation="vertical" android:padding="8dp">
-        <Button android:id="@+id/btnLine1" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/line1" />
-        <Button android:id="@+id/btnLine2" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/line2" />
+        <Button android:id="@+id/btnSetup" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/setup" />
         <Button android:id="@+id/btnStart" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="@string/start" />
         <Button android:id="@+id/btnDim" android:layout_width="wrap_content" android:layout_height="wrap_content"

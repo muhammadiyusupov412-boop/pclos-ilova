@@ -45,6 +45,8 @@ class SessionLog(
     private val buckets = java.util.TreeMap<Pair<Long, String>, HashMap<String, Int>>(
         compareBy<Pair<Long, String>>({ it.first }, { it.second }))
     val totals = HashMap<String, Int>()
+    /** "bola:erkak" -> soni */
+    val ageGender = HashMap<String, Int>()
 
     init {
         dir.mkdirs()
@@ -74,10 +76,24 @@ class SessionLog(
             m["jins:${e.gender}"] = (m["jins:${e.gender}"] ?: 0) + 1
             val ag = "yj:${e.category}:${e.gender}"  // yosh guruhi x jins
             m[ag] = (m[ag] ?: 0) + 1
+            ageGender["${e.category}:${e.gender}"] = (ageGender["${e.category}:${e.gender}"] ?: 0) + 1
         }
         totals[k] = (totals[k] ?: 0) + 1
         if (e.obj == "piyoda" && e.gender.isNotEmpty()) totals["jins:${e.gender}"] = (totals["jins:${e.gender}"] ?: 0) + 1
     }
+
+    /** Barcha chiziqlar bo'yicha bitta intervaldagi eng katta son (masalan HCM n15). */
+    @Synchronized
+    fun peakInterval(obj: String): Int {
+        val byT = HashMap<Long, Int>()
+        for ((key, m) in buckets) byT[key.first] = (byT[key.first] ?: 0) + m.filterKeys { it.startsWith("$obj:") }.values.sum()
+        return byT.values.maxOrNull() ?: 0
+    }
+
+    @Synchronized
+    fun pcuTotal(): Double = VEHICLES.sumOf { ((totals["transport:$it"] ?: 0) * (pcu[it] ?: 1f)).toDouble() }
+
+    val intervalMinutes get() = intervalMin
 
     @Synchronized
     fun writeIntervals() {
