@@ -25,7 +25,7 @@ sahifasidan `Chorraha-Kozi.apk` ni telefonda yuklab oling va o'rnating ("Noma'lu
 
 ### Dalada ishlatish
 1. Telefonni **shtativga** o'rnating, kamera chorrahaga **yuqoriroqdan va yonroqdan** qarasin (piyodalar bir-birini to'smasin).
-2. Ilovada chorraha nomini yozing, **Kamerani ochish**.
+2. Ilovada chorraha nomini yozing va **sanash rejimini** tanlang: piyoda va transport birga, faqat piyodalar yoki faqat transport. **Kamerani ochish**.
 3. **1-chiziq** ni bosing va barmoq bilan **piyodalar o'tish joyini ko'ndalangiga kesuvchi** chiziq torting
    (piyoda yo'lni kesib o'tayotganda shu chiziqdan o'tishi kerak).
 4. **2-chiziq** bilan **transport yo'lini ko'ndalangiga kesuvchi** chiziq torting.
@@ -36,7 +36,8 @@ sahifasidan `Chorraha-Kozi.apk` ni telefonda yuklab oling va o'rnating ("Noma'lu
 
 ### Natija fayllari (ZIP ichida)
 - `intervallar.csv` — har 15 daqiqa va har chiziq bo'yicha:
-  `piyoda_bola, piyoda_kattalar, piyoda_keksa, piyoda_noaniq, piyoda_jami, erkak, ayol, bola_% …,
+  `piyoda_bola, piyoda_kattalar, piyoda_keksa, piyoda_noaniq, piyoda_jami, erkak, ayol, jinsi_noaniq,
+  bola_erkak, bola_ayol, kattalar_erkak, kattalar_ayol, keksa_erkak, keksa_ayol, bola_% …,
   yengil, avtobus, yuk, mototsikl, velosiped, transport_jami, keltirilgan_birlik, soatlik_jadallik_avt, soatlik_jadallik_kb, …_%`
 - `hodisalar.csv` — har bir sanalgan obyekt: vaqt, trek raqami, toifa, jins, ishonch, chiziq, yo'nalish (A→B / B→A).
 - `malumot.txt` — chorraha, boshlanish/tugash vaqti, sozlamalar, chiziq koordinatalari, telefon modeli.

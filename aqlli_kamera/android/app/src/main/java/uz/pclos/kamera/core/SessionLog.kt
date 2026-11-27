@@ -28,6 +28,7 @@ class SessionLog(
 ) {
     companion object {
         val AGE_GROUPS = listOf("bola", "kattalar", "keksa", "noaniq")
+        val GENDERS = listOf("erkak", "ayol")
         val VEHICLES = listOf("yengil", "avtobus", "yuk", "mototsikl", "velosiped")
         /** Yengil avtomobilga keltirish koeffitsientlari (o'z me'yoringizga moslang). */
         val DEFAULT_PCU = mapOf(
@@ -69,7 +70,11 @@ class SessionLog(
         val m = buckets.getOrPut(key) { HashMap() }
         val k = "${e.obj}:${e.category}"
         m[k] = (m[k] ?: 0) + 1
-        if (e.obj == "piyoda" && e.gender.isNotEmpty()) m["jins:${e.gender}"] = (m["jins:${e.gender}"] ?: 0) + 1
+        if (e.obj == "piyoda" && e.gender.isNotEmpty()) {
+            m["jins:${e.gender}"] = (m["jins:${e.gender}"] ?: 0) + 1
+            val ag = "yj:${e.category}:${e.gender}"  // yosh guruhi x jins
+            m[ag] = (m[ag] ?: 0) + 1
+        }
         totals[k] = (totals[k] ?: 0) + 1
         if (e.obj == "piyoda" && e.gender.isNotEmpty()) totals["jins:${e.gender}"] = (totals["jins:${e.gender}"] ?: 0) + 1
     }
@@ -79,7 +84,8 @@ class SessionLog(
         val sb = StringBuilder(BOM)
         val head = mutableListOf("interval_boshi", "interval_oxiri", "chiziq")
         AGE_GROUPS.forEach { head += "piyoda_$it" }
-        head += listOf("piyoda_jami", "erkak", "ayol")
+        head += listOf("piyoda_jami", "erkak", "ayol", "jinsi_noaniq")
+        for (a in AGE_GROUPS.take(3)) for (g in GENDERS) head += "${a}_$g"
         AGE_GROUPS.take(3).forEach { head += "${it}_%" }
         VEHICLES.forEach { head += it }
         head += listOf("transport_jami", "keltirilgan_birlik", "soatlik_jadallik_avt", "soatlik_jadallik_kb")
@@ -92,7 +98,8 @@ class SessionLog(
             val ped = AGE_GROUPS.map { m["piyoda:$it"] ?: 0 }
             val pedTotal = ped.sum()
             row.addAll(ped); row += pedTotal
-            row += (m["jins:erkak"] ?: 0); row += (m["jins:ayol"] ?: 0)
+            row += (m["jins:erkak"] ?: 0); row += (m["jins:ayol"] ?: 0); row += (m["jins:noaniq"] ?: 0)
+            for (a in AGE_GROUPS.take(3)) for (g in GENDERS) row += (m["yj:$a:$g"] ?: 0)
             ped.take(3).forEach { row += pct(it, pedTotal) }
             val veh = VEHICLES.map { m["transport:$it"] ?: 0 }
             val vehTotal = veh.sum()

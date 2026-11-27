@@ -82,6 +82,9 @@ class CoreTest {
         assertEquals(3, csv.size) // sarlavha + 2 chiziq
         val ev = File(dir, "hodisalar.csv").readLines()
         assertTrue(ev.any { it.contains(",piyoda,bola,ayol,") })
+        val head = csv[0].split(","); val row = csv.drop(1).map { it.split(",") }.first { it[2] == "piyoda" }
+        assertEquals("1", row[head.indexOf("bola_ayol")])
+        assertEquals("1", row[head.indexOf("ayol")])
     }
 
     @Test
